@@ -16,4 +16,5 @@ end_time = time.perf_counter()
 elapsed_seconds = end_time - start_time
 elapsed_minutes = elapsed_seconds / 60
 
+
 print(f"Script runtime: {elapsed_minutes:.2f} minutes")

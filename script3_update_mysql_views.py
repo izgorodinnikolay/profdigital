@@ -1,0 +1,280 @@
+import os
+from dotenv import load_dotenv
+from func_update_data_on_mysql import mysql_update_view
+
+def run_script_update_mysql_views():
+
+    load_dotenv(r'C:\Users\user\Desktop\Maks\projects\invoices_2026_07_26\variables.env')
+
+    ########################################################################################################################
+    # VARIABLES
+
+    # MySQL
+    DB_HOST = os.getenv("DB_HOST")
+    DB_PORT = int(os.getenv("DB_PORT"))
+    DB_DBNAME = os.getenv("DB_DBNAME")
+    DB_SUPER_USER = os.getenv("DB_SUPER_USER")
+    DB_SUPER_PASSWORD = os.getenv("DB_SUPER_PASSWORD")
+    DB_SUPER_DBNAME = os.getenv("DB_SUPER_DBNAME")
+
+
+    ########################################################################################################################
+    TBL_DB='j28046070_sandbox'
+    TBL_NAME='view_leads'
+    QUERY = f"""insert into {TBL_DB}.{TBL_NAME}(project, dateAdd, dateTimeAdd, inn, legalEntity, source, company, name, phone, city, branch, sendStatus, sendDateTime, purchase, sale, duplicateFlag, id)
+                select project, dateAdd, dateTimeAdd
+                    ,case when length(inn) in (9, 11) then concat('0', inn) else inn end as inn
+                    ,legalEntity, source, company, name, phone, city, branch, sendStatus, sendDateTime, purchase, sale
+                   ,case when row_number() over(partition by inn, phone, source, dateAdd - INTERVAL (DAY(dateAdd) - 1) DAY order by dateTimeAdd) > 1 then 'Дубликат' else '' end as duplicateFlag
+                   ,id
+                from j28046070_leads.leads"""
+
+    mysql_update_view(
+        db_user=DB_SUPER_USER,
+        db_password=DB_SUPER_PASSWORD,
+        db_host=DB_HOST,
+        db_port=DB_PORT,
+        db_dbname='j28046070_leads',
+        tbl_name=TBL_NAME,
+        tbl_db=TBL_DB,
+        query=QUERY
+    )
+
+
+    ########################################################################################################################
+    TBL_DB='j28046070_sandbox'
+    TBL_NAME='view_invoices'
+    QUERY = f"""insert into {TBL_DB}.{TBL_NAME}
+            with 
+             invoice_nomenclature_rn as (
+                select invoice_id, nomenclature_text_gr, nomenclature_text, row_number() over(partition by invoice_id order by amount desc) as rn 
+                from j28046070_sandbox.invoice_detailed_1c)
+            ,invoice_nomenclature as (select * from invoice_nomenclature_rn where rn = 1)
+            ,leads_groupped as (select inn, min(dateAdd) as min_lead_date from j28046070_sandbox.view_leads group by inn)
+            ,receipts_filtered as (
+                select rd.invoice_id, sum(rd.receipt_amount) as receipt_amount, max(r.receipt_dt) as receipt_dt
+                from j28046070_sandbox.receipts_1c as r
+                join j28046070_sandbox.receipts_detailed_1c as rd on r.receipt_id=rd.receipt_id
+                where r.is_posted and not r.is_deleted
+                group by rd.invoice_id
+                )
+            ,report_invoices as (
+                select i.invoice_id, i.invoice_number, i.invoice_dt, n.nomenclature_text, coalesce(n.nomenclature_text_gr, 'Прочее') as nomenclature_text_gr
+                    ,case when not i.is_posted then 'Не опубликован'
+                          when i.is_deleted then 'Удален'
+                          else 'Корректный'
+                    end as invoice_status
+                    ,o.organization_name, o.organization_inn
+                    ,p.partner_name, p.partner_inn, p.partner_type
+                    ,i.invoice_amount
+                    ,r.receipt_amount, r.receipt_dt
+                    ,case when coalesce(r.receipt_amount, 0) = 0 then 'Не оплачен'
+                          when r.receipt_amount > 0 and r.receipt_amount < i.invoice_amount then 'Оплачен частично'
+                          when r.receipt_amount = i.invoice_amount then 'Оплачен'
+                          when r.receipt_amount > i.invoice_amount then 'Оплата больше счета'
+                          else '!!!ERROR!!!'
+                    end as invoice_payment_status
+                    ,case when lg.inn is null then 'Нет лидов'
+                          when i.invoice_dt < lg.min_lead_date then 'До первого лида'
+                          else 'Корректный'
+                    end as invoice_details
+                from j28046070_sandbox.invoice_1c as i
+                left join invoice_nomenclature as n on i.invoice_id=n.invoice_id
+                left join receipts_filtered as r on i.invoice_id=r.invoice_id
+                left join j28046070_sandbox.organizations_1c as o on i.organization_id=o.organization_id -- and not o.is_deleted
+                left join j28046070_sandbox.partners_1c as p on i.partner_id=p.partner_id -- and not p.is_deleted
+                left join leads_groupped as lg on p.partner_inn = lg.inn
+                )
+            select * from report_invoices"""
+
+    mysql_update_view(
+        db_user=DB_SUPER_USER,
+        db_password=DB_SUPER_PASSWORD,
+        db_host=DB_HOST,
+        db_port=DB_PORT,
+        db_dbname='j28046070_leads',
+        tbl_name=TBL_NAME,
+        tbl_db=TBL_DB,
+        query=QUERY,
+        big_query_flag=True
+    )
+
+
+    ########################################################################################################################
+    TBL_DB='j28046070_sandbox'
+    TBL_NAME='view_payment_method'
+    QUERY = f"""insert into {TBL_DB}.{TBL_NAME}
+                with 
+                 partners_1c_rn as (select partner_inn, partner_name, row_number() over(partition by partner_inn order by partner_number desc) as rn from j28046070_sandbox.partners_1c)
+                ,partners_1c_final as (select partner_inn, partner_name from partners_1c_rn where rn = 1)
+                ,legalEntity_rn as (select inn, legalEntity, row_number() over(partition by inn order by dateTimeAdd desc) as rn from j28046070_sandbox.view_leads)
+                ,legalEntity_final as (select inn, legalEntity from legalEntity_rn where rn = 1)
+                ,payment_method_rn as (
+                    select *, row_number() over(partition by inn order by payment_type) as rn 
+                    from j28046070_sandbox.payment_method)
+                ,payment_method_final as (select * from payment_method_rn where rn = 1)
+                ,view_leads_groupped as (select distinct inn from j28046070_sandbox.view_leads)
+                ,final as (
+                    select project, legal_entity, inn, deposit_min_value, deposit_average_value, payment_type, comment, flg_stop from payment_method_final
+                    UNION
+                    select 'нет инфо' as project
+                        ,coalesce(pf.partner_name, lef.legalEntity, 'нет инфо') as legal_entity
+                        ,vlg.inn as inn
+                        ,0 as deposit_min_value
+                        ,0 as deposit_average_value
+                        ,'постоплата. еженедельно' as payment_type
+                        ,'Заполнить Google таблицу' as comment
+                        ,'' as flg_stop
+                    from view_leads_groupped as vlg 
+                    left join payment_method_final as pmf on vlg.inn = pmf.inn
+                    left join partners_1c_final as pf on vlg.inn = pf.partner_inn
+                    left join legalEntity_final as lef on vlg.inn = lef.inn
+                    where pmf.inn is null
+                    )
+                select * from final"""
+
+    mysql_update_view(
+        db_user=DB_SUPER_USER,
+        db_password=DB_SUPER_PASSWORD,
+        db_host=DB_HOST,
+        db_port=DB_PORT,
+        db_dbname='j28046070_leads',
+        tbl_name=TBL_NAME,
+        tbl_db=TBL_DB,
+        query=QUERY,
+        big_query_flag=True
+    )
+
+
+    ########################################################################################################################
+    TBL_DB='j28046070_sandbox'
+    TBL_NAME='view_invoice_report'
+    QUERY = rf"""insert into {TBL_DB}.{TBL_NAME}
+    with 
+     payment_method_intervals as (
+        select *
+            ,case when payment_type = 'депозит' then cast('2000-01-01' as date)
+                  when payment_type = 'постоплата. еженедельно' then DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) + 7 DAY)
+                  when payment_type = 'постоплата. 15 и 30' and DAY(CURDATE()) <= 15 then DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) DAY), '%%Y-%%m-16')
+                  when payment_type = 'постоплата. 15 и 30' and DAY(CURDATE()) >  15 then DATE_FORMAT(CURDATE(), '%%Y-%%m-01')
+                  when payment_type = 'постоплата. ежемесячно' then DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) DAY), '%%Y-%%m-01') -- говно
+            end as leads_start
+            ,case when payment_type = 'депозит' then DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) + 1 DAY)
+                  when payment_type = 'постоплата. еженедельно' then DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) + 1 DAY)
+                  when payment_type = 'постоплата. 15 и 30' and DAY(CURDATE()) <= 15 then DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) DAY)
+                  when payment_type = 'постоплата. 15 и 30' and DAY(CURDATE()) >  15 then DATE_FORMAT(CURDATE(), '%%Y-%%m-15')
+                  when payment_type = 'постоплата. ежемесячно' then DATE_SUB(CURDATE(), INTERVAL DAY(CURDATE()) DAY) -- говно
+            end as leads_end
+            ,case when payment_type = 'депозит' then cast('2000-01-01' as date)
+                  when payment_type = 'постоплата. еженедельно' then DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)
+                  when payment_type = 'постоплата. 15 и 30' and DAY(CURDATE()) <= 15 then DATE_FORMAT(CURDATE(), '%%Y-%%m-01')
+                  when payment_type = 'постоплата. 15 и 30' and DAY(CURDATE()) >  15 then DATE_FORMAT(CURDATE(), '%%Y-%%m-16')
+                  when payment_type = 'постоплата. ежемесячно' then DATE_FORMAT(CURDATE(), '%%Y-%%m-01')
+            end as invoice_start
+            ,case when payment_type = 'депозит' then DATE_ADD(CURDATE(), INTERVAL (6 - WEEKDAY(CURDATE())) DAY)
+                  when payment_type = 'постоплата. еженедельно' then DATE_ADD(CURDATE(), INTERVAL (6 - WEEKDAY(CURDATE())) DAY)
+                  when payment_type = 'постоплата. 15 и 30' and DAY(CURDATE()) <= 15 then DATE_FORMAT(CURDATE(), '%%Y-%%m-15')
+                  when payment_type = 'постоплата. 15 и 30' and DAY(CURDATE()) >  15 then LAST_DAY(CURDATE())
+                  when payment_type = 'постоплата. ежемесячно' then LAST_DAY(CURDATE())
+            end as invoice_end
+        from j28046070_sandbox.view_payment_method)
+    ,leads_groupped as (
+        select vl.inn
+            ,count(*) as total_cnt
+            ,sum(vl.purchase) as total_purchase
+            ,sum(vl.sale) as total_sale
+            ,sum(case when vl.dateAdd between pmi.leads_start and pmi.leads_end then 1 else 0 end) as interval_cnt
+            ,sum(case when vl.dateAdd between pmi.leads_start and pmi.leads_end then vl.purchase else 0 end) as interval_purchase
+            ,sum(case when vl.dateAdd between pmi.leads_start and pmi.leads_end then vl.sale else 0 end) as interval_sale
+        from j28046070_sandbox.view_leads as vl 
+        join payment_method_intervals as pmi on vl.inn = pmi.inn
+        where vl.duplicateFlag = ''
+        group by vl.inn)
+    ,invoices_groupped as (
+        select pmi.inn
+            ,sum(invoice_amount) as total_invoice
+            ,sum(receipt_amount) as total_receipt
+            ,sum(case when vi.invoice_dt between pmi.invoice_start and pmi.invoice_end then vi.invoice_amount else 0 end) as interval_invoice
+            ,sum(case when vi.invoice_dt between pmi.invoice_start and pmi.invoice_end then vi.receipt_amount else 0 end) as interval_receipt
+        from j28046070_sandbox.view_invoices as vi
+        join payment_method_intervals as pmi on vi.partner_inn = pmi.inn
+        where 1=1
+        and vi.invoice_status = 'Корректный' 
+        and vi.invoice_details in ('Корректный', 'До первого лида', 'Нет лидов')
+        and vi.nomenclature_text_gr = 'Лиды'
+        group by partner_inn
+        )
+    ,report as (
+        select l.inn, pmi.project, pmi.legal_entity
+            ,'Данные по способу оплаты' as txt_payment_type
+            ,pmi.payment_type
+            ,pmi.deposit_min_value
+            ,pmi.deposit_average_value
+            ,'Данные за отчетный период' as txt_interval_leads
+            ,concat('лиды за период c ', date_format(leads_start, '%%Y-%%m-%%d'), ' по ', date_format(leads_end, '%%Y-%%m-%%d')) AS interval_leads
+            ,l.interval_cnt
+            ,l.interval_purchase
+            ,l.interval_sale
+            ,concat('счета за период c ', date_format(invoice_start, '%%Y-%%m-%%d'), ' по ', date_format(invoice_end, '%%Y-%%m-%%d')) AS interval_invoices
+            ,coalesce(i.interval_invoice, 0) as interval_invoice
+            ,coalesce(i.interval_receipt, 0) as interval_receipt
+            ,'(счета - лиды) за период' as txt_interval_invoice
+            ,coalesce(i.interval_invoice, 0) - l.interval_sale as interval_leads_minus_invoices
+            ,case when coalesce(i.interval_invoice, 0) - l.interval_sale < pmi.deposit_min_value
+                  then pmi.deposit_average_value - coalesce(i.interval_invoice, 0) + l.interval_sale
+                  else 0 end as interval_new_invoice
+            ,'Данные за всю историю' as txt_total_leads
+            ,l.total_cnt
+            ,l.total_purchase
+            ,l.total_sale
+            ,'Данные за всю историю' as txt_total_invoices
+            ,coalesce(i.total_invoice, 0) as total_invoice
+            ,coalesce(i.total_receipt, 0) as receipt_total
+            ,'(счета - лиды) за всю историю' as txt5
+            ,coalesce(i.total_invoice, 0) - l.total_sale as invoice_total_check
+            ,case when coalesce(i.total_invoice, 0) - l.total_sale < pmi.deposit_min_value
+                  then pmi.deposit_average_value - coalesce(i.total_invoice, 0) + l.total_sale
+                  else 0 end as total_check
+            ,'техническая информация' as txt6
+            ,pmi.comment
+        from leads_groupped as l
+        left join invoices_groupped as i on l.inn = i.inn
+        left join payment_method_intervals as pmi on l.inn = pmi.inn)
+    select * from report order by interval_sale desc"""
+
+    mysql_update_view(
+        db_user=DB_SUPER_USER,
+        db_password=DB_SUPER_PASSWORD,
+        db_host=DB_HOST,
+        db_port=DB_PORT,
+        db_dbname='j28046070_leads',
+        tbl_name=TBL_NAME,
+        tbl_db=TBL_DB,
+        query=QUERY,
+        big_query_flag=True
+    )
+
+
+    ########################################################################################################################
+    TBL_DB='j28046070_sandbox'
+    TBL_NAME='view_new_invoices'
+    QUERY = rf"""insert into {TBL_DB}.{TBL_NAME}
+    select inn, project, legal_entity
+        ,payment_type, deposit_min_value, deposit_average_value
+        ,interval_sale, interval_invoice, interval_invoice - interval_sale as invoice_minus_sale
+        ,interval_new_invoice
+    from j28046070_sandbox.view_invoice_report
+    where interval_new_invoice > 0
+    order by interval_new_invoice desc"""
+
+    mysql_update_view(
+        db_user=DB_SUPER_USER,
+        db_password=DB_SUPER_PASSWORD,
+        db_host=DB_HOST,
+        db_port=DB_PORT,
+        db_dbname='j28046070_leads',
+        tbl_name=TBL_NAME,
+        tbl_db=TBL_DB,
+        query=QUERY,
+        big_query_flag=True
+    )

@@ -33,7 +33,7 @@ def run_get_data_fom_mysql_and_send_email():
         db_host=DB_HOST,
         db_port=DB_PORT,
         db_dbname=DB_DBNAME,
-        query=f"""select * from j28046070_sandbox.view_leads""",
+        query=f"""select * from j28046070_sandbox.view_leads order by dateTimeAdd desc""",
     )
 
     df_invoices = get_df_from_db(
@@ -42,7 +42,7 @@ def run_get_data_fom_mysql_and_send_email():
         db_host=DB_HOST,
         db_port=DB_PORT,
         db_dbname=DB_DBNAME,
-        query=f"""select * from j28046070_sandbox.view_invoices""",
+        query=f"""select * from j28046070_sandbox.view_invoices order by invoice_dt desc""",
     )
 
     df_invoice_report = get_df_from_db(
@@ -51,7 +51,7 @@ def run_get_data_fom_mysql_and_send_email():
         db_host=DB_HOST,
         db_port=DB_PORT,
         db_dbname=DB_DBNAME,
-        query=f"""select * from j28046070_sandbox.view_invoice_report""",
+        query=f"""select * from j28046070_sandbox.view_invoice_report order by interval_leads_minus_invoices""",
     )
 
     df_payment_method = get_df_from_db(

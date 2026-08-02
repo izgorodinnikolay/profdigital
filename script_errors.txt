@@ -1,0 +1,1 @@
+[2026-07-26 21:44:19] export_df_to_db error. table=status_1c. attempt=1/10. error=No module named 'pymysql'

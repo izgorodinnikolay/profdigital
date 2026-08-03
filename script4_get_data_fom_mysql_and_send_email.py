@@ -33,7 +33,7 @@ def run_get_data_fom_mysql_and_send_email():
         db_host=DB_HOST,
         db_port=DB_PORT,
         db_dbname=DB_DBNAME,
-        query=f"""select * from j28046070_sandbox.view_leads order by dateTimeAdd desc""",
+        query=f"""select * from j28046070_sandbox.view_leads where dateAdd >= DATE_FORMAT(NOW() - INTERVAL 2 MONTH, '%Y-%m-01') order by dateTimeAdd desc""",
     )
 
     df_invoices = get_df_from_db(

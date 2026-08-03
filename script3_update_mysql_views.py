@@ -24,7 +24,9 @@ def run_script_update_mysql_views():
     QUERY = f"""insert into {TBL_DB}.{TBL_NAME}
                 select l.project, l.dateAdd, l.dateTimeAdd
                 	,DATE_ADD(l.dateAdd, INTERVAL (6 - WEEKDAY(l.dateAdd)) DAY) as week_end
-                	,case when l.inn = '720307197077' then '2466279351'
+                	,case when l.inn = '720307197077' then '2463115644'
+                          when l.inn = '761107378757' then '760212666248'
+                          when upper(l.legalentity) like '%%ЮКЛИН%%' then '0274140585'
                 		when length(l.inn) in (9, 11) then '0'||l.inn else l.inn end as inn
                 	,l.legalEntity, l.source, l.company, l.name, l.phone, l.city
                 	,case when l.inn in ('2310229806', '3900034752', '4205421649') then l.city else '' end as city_invoice
@@ -112,6 +114,7 @@ def run_script_update_mysql_views():
         big_query_flag=True
     )
 
+
     ########################################################################################################################
     TBL_DB = 'j28046070_sandbox'
     TBL_NAME = 'view_payment_method'
@@ -163,7 +166,23 @@ def run_script_update_mysql_views():
     TBL_NAME = 'view_invoice_report'
     QUERY = rf"""insert into {TBL_DB}.{TBL_NAME}
                 with 
-                 payment_method_intervals as (
+                 partners_1c_city as (
+                	select partner_inn, partner_name
+                		,case when partner_inn = '2310229806' and partner_name = 'ООО МЕДИЦИНА Краснодар' then 'Краснодар'
+                			  when partner_inn = '3900034752' and partner_name = 'СТОМАТОЛОГИЯ ТОМСК' then 'Томск'
+                			  when partner_inn = '3900034752' and partner_name = 'СТОМАТОЛОГИЯ КАЛИНИНГРАД ООО' then 'Калининград'
+                			  when partner_inn = '4205421649' and partner_name = 'ООО КОМАНДА МЕЧТЫ КЕМЕРОВО' then 'Кемерово'
+                			  when partner_inn = '4205421649' and partner_name = 'ООО КОМАНДА МЕЧТЫ КЕМЕРОВО Новокузнецк' then 'Новокузнецк' 
+                			  else ''
+                		end as city_invoice
+                	from j28046070_sandbox.partners_1c)
+                ,partners_1c_rn as (
+                	select partner_inn, city_invoice, partner_name
+                		,row_number() over(partition by partner_inn, city_invoice order by partner_name) as rn 
+                	from partners_1c_city
+                	)
+                ,partners_1c_final as (select partner_inn, city_invoice, partner_name from partners_1c_rn where rn = 1)
+                ,payment_method_intervals as (
                 	select *
                 		,case when payment_type = 'депозит' then cast('2000-01-01' as date)
                 			  when payment_type = 'постоплата. еженедельно' then DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) + 7 DAY)
@@ -242,8 +261,14 @@ def run_script_update_mysql_views():
                 	and vi.nomenclature_text_gr = 'Лиды'
                 	group by vi.partner_inn, vi.city_invoice
                 	)
+                ,invoices_corrected as (
+                	select inn, city_invoice, total_invoice, total_receipt, interval_invoice, interval_receipt
+                		,case when interval_receipt > interval_invoice then interval_receipt else interval_invoice end as interval_invoice_corrected
+                		,curr_invoice, curr_receipt
+                	from invoices_groupped
+                	)
                 ,report as (
-                	select l.inn, pmi.project, pmi.legal_entity, l.city_invoice
+                	select l.inn, pmi.project, coalesce(pf.partner_name, pmi.legal_entity) as legal_entity, l.city_invoice
                 		,'Данные по способу оплаты' as txt_payment_type
                 		,pmi.payment_type
                 		,pmi.deposit_min_value
@@ -256,23 +281,26 @@ def run_script_update_mysql_views():
                 		,concat('счета за период c ', date_format(invoice_start, '%%Y-%%m-%%d'), ' по ', date_format(invoice_end, '%%Y-%%m-%%d')) AS interval_invoices
                 		,coalesce(i.interval_invoice, 0) as interval_invoice
                 		,coalesce(i.interval_receipt, 0) as interval_receipt
+                		,coalesce(corr.correction, 0) as interval_correction
                 		,'(счета - лиды) за период' as txt_interval_invoice
-                		,coalesce(i.interval_invoice, 0) - l.interval_sale as interval_leads_minus_invoices
-                		,case when coalesce(i.interval_invoice, 0) - l.interval_sale >= pmi.deposit_min_value then 'Нет'
-                			  when l.prev_cnt = 0 then 'Нет'
-                			  when i.curr_invoice > 0 then 'Нет'
+                		,coalesce(i.interval_invoice, 0) + coalesce(corr.correction, 0) - l.interval_sale as interval_leads_minus_invoices
+                		,case when l.prev_cnt = 0 
+                				or i.curr_invoice > 0 
+                				or coalesce(i.interval_invoice, 0) + coalesce(corr.correction, 0) - l.interval_sale >= pmi.deposit_min_value
+                			  then 'Нет'
                 			  else 'Да'
                 		end as new_invoice_flag
-                		,case when coalesce(i.interval_invoice, 0) - l.interval_sale >= pmi.deposit_min_value then 'Нет лидов / остаток больше депозита'
-                			  when l.prev_cnt = 0 then concat('Нет лидов с ', date_format(leads_prev_start, '%%Y-%%m-%%d'), 'по ', date_format(leads_prev_end, '%%Y-%%m-%%d'))
-                			  when i.curr_invoice > 0 then concat('Уже выставлен счет с ', date_format(invoice_curr_start, '%%Y-%%m-%%d'), 'по ', date_format(invoice_curr_end, '%%Y-%%m-%%d'))
+                		,case when l.prev_cnt = 0 then concat('Нет лидов с ', date_format(leads_prev_start, '%%Y-%%m-%%d'), 'по ', date_format(leads_prev_end, '%%Y-%%m-%%d'))
+                			  when i.curr_invoice > 0 then concat('Уже выставлен счет с ', date_format(invoice_curr_start, '%%Y-%%m-%%d'), ' по ', date_format(invoice_curr_end, '%%Y-%%m-%%d'))
+                			  when pmi.payment_type = 'депозит' and coalesce(i.interval_invoice_corrected, 0) + coalesce(corr.correction, 0) - l.interval_sale >= pmi.deposit_min_value then 'Остаток больше депозита'
+                			  when coalesce(i.interval_invoice_corrected, 0) + coalesce(corr.correction, 0) - l.interval_sale >= 0 then 'Сумма выставленных счетов >= Стоимости лидов'
                 			  else ''
                 		end as new_invoice_description
-                		,case when coalesce(i.interval_invoice, 0) - l.interval_sale < pmi.deposit_min_value and l.prev_cnt > 0 and i.curr_invoice = 0
+                		,case when coalesce(i.interval_invoice_corrected, 0) + coalesce(corr.correction, 0) - l.interval_sale < pmi.deposit_min_value and l.prev_cnt > 0 and i.curr_invoice = 0
                 			then
-                				case when pmi.payment_type = 'депозит' and coalesce(i.interval_invoice, 0) - l.interval_sale >= 0 then pmi.deposit_min_value
-                					 when pmi.payment_type = 'депозит' and coalesce(i.interval_invoice, 0) - l.interval_sale < 0 then pmi.deposit_min_value + (l.interval_sale - coalesce(i.interval_invoice, 0))
-                				  	 else pmi.deposit_average_value - coalesce(i.interval_invoice, 0) + l.interval_sale
+                				case when pmi.payment_type = 'депозит' and coalesce(i.interval_invoice_corrected, 0) + coalesce(corr.correction, 0) - l.interval_sale >= 0 then pmi.deposit_min_value
+                					 when pmi.payment_type = 'депозит' and coalesce(i.interval_invoice_corrected, 0) + coalesce(corr.correction, 0) - l.interval_sale < 0 then pmi.deposit_min_value + (l.interval_sale - coalesce(i.interval_invoice, 0))
+                				  	 else pmi.deposit_average_value - coalesce(i.interval_invoice_corrected, 0) + l.interval_sale
                 				end
                 			else 0 
                 		end as new_invoice_amount
@@ -281,12 +309,12 @@ def run_script_update_mysql_views():
                 		,l.total_purchase
                 		,l.total_sale
                 		,'Данные за всю историю' as txt_total_invoices
-                		,coalesce(i.total_invoice, 0) as total_invoice
-                		,coalesce(i.total_receipt, 0) as receipt_total
+                		,coalesce(i.total_invoice, 0) + coalesce(corr.correction, 0) as total_invoice
+                		,coalesce(i.total_receipt, 0) + coalesce(corr.correction, 0) as receipt_total
                 		,'(счета - лиды) за всю историю' as txt5
-                		,coalesce(i.total_invoice, 0) - l.total_sale as invoice_total_check
-                		,case when coalesce(i.total_invoice, 0) - l.total_sale < pmi.deposit_min_value
-                			  then pmi.deposit_average_value - coalesce(i.total_invoice, 0) + l.total_sale
+                		,coalesce(i.total_invoice, 0) + coalesce(corr.correction, 0) - l.total_sale as invoice_total_check
+                		,case when coalesce(i.total_invoice, 0) + coalesce(corr.correction, 0) - l.total_sale < pmi.deposit_min_value
+                			  then pmi.deposit_average_value - coalesce(i.total_invoice, 0) - coalesce(corr.correction, 0) + l.total_sale
                 			  else 0 end as total_check
                 		,'проверка необходимости выставления счетов' txt_check
                 		,l.prev_cnt
@@ -298,8 +326,11 @@ def run_script_update_mysql_views():
                 		,'техническая информация' as txt_comment
                 		,pmi.comment
                 	from leads_groupped as l
-                	left join invoices_groupped as i on l.inn = i.inn and l.city_invoice = i.city_invoice
-                	left join payment_method_intervals as pmi on l.inn = pmi.inn)
+                	left join invoices_corrected as i on l.inn = i.inn and l.city_invoice = i.city_invoice
+                	left join payment_method_intervals as pmi on l.inn = pmi.inn
+                	left join j28046070_sandbox.deposit_corrections as corr on l.inn = corr.inn
+                	left join partners_1c_final as pf on l.inn = pf.partner_inn and l.city_invoice = pf.city_invoice
+                	)
                 select * from report"""
 
     mysql_update_view(
@@ -324,7 +355,7 @@ def run_script_update_mysql_views():
                 	,interval_sale, interval_invoice, interval_invoice - interval_sale as invoice_minus_sale
                 	,new_invoice_flag, new_invoice_description, new_invoice_amount
                 from j28046070_sandbox.view_invoice_report
-                where interval_invoice - interval_sale < deposit_min_value
+                where interval_correction + interval_invoice - interval_sale < deposit_min_value
                 order by new_invoice_flag, interval_invoice - interval_sale"""
 
     mysql_update_view(

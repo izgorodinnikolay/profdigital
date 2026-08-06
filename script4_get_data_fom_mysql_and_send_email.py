@@ -69,7 +69,7 @@ def run_get_data_fom_mysql_and_send_email():
         db_host=DB_HOST,
         db_port=DB_PORT,
         db_dbname=DB_DBNAME,
-        query=f"""select * from j28046070_sandbox.view_new_invoices""",
+        query=f"""select * from j28046070_sandbox.view_new_invoices order by new_invoice_flag, interval_leads_minus_invoices""",
     )
 
     ########################################################################################################################

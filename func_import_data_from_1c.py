@@ -2,15 +2,18 @@ import pandas as pd
 import requests
 import os
 import sys
-import time
-from datetime import datetime, time, timezone
+from datetime import datetime, timezone
 from dotenv import load_dotenv
 from requests.auth import HTTPBasicAuth
 from sqlalchemy import create_engine, text
+from time import sleep
 
 load_dotenv(r'C:\Users\user\Desktop\Maks\projects\invoices_2026_07_26\variables.env')
 
 ERROR_LOG_FILE = os.getenv("ERROR_LOG_FILE")
+
+MAX_RETRIES = 5
+RETRY_SLEEP_SECONDS = 180
 
 def write_error_to_txt(text: str, file_name: str = ERROR_LOG_FILE):
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -48,16 +51,16 @@ def export_df_to_db(
 
 
 def export_df_to_db_with_retry(
-        df_src: pd.DataFrame,
-        db_user: str,
-        db_password: str,
-        db_host: str,
-        db_port: int,
-        db_dbname: str,
-        db_table: str,
-        truncate: bool = True,
-        max_retries: int = 10,
-        retry_sleep_seconds: int = 300
+    df_src: pd.DataFrame,
+    db_user: str,
+    db_password: str,
+    db_host: str,
+    db_port: int,
+    db_dbname: str,
+    db_table: str,
+    truncate: bool = True,
+    max_retries: int = MAX_RETRIES,
+    retry_sleep_seconds: int = RETRY_SLEEP_SECONDS
 ):
     for attempt in range(1, max_retries + 1):
         try:
@@ -82,17 +85,17 @@ def export_df_to_db_with_retry(
                 write_error_to_txt(f'script finished after {max_retries} tries')
                 sys.exit(1)
 
-            time.sleep(retry_sleep_seconds)
+            sleep(retry_sleep_seconds)
 
     return False
 
 
 def build_status_df(
-        document: str,
-        status: str,
-        error_type=None,
-        error_text=None,
-        error_response_text=None
+    document: str,
+    status: str,
+    error_type=None,
+    error_text=None,
+    error_response_text=None
 ) -> pd.DataFrame:
     return pd.DataFrame([{
         'document': document,
@@ -100,16 +103,16 @@ def build_status_df(
         'status': status,
         'error_type': error_type,
         'error_text': error_text,
-        'error_response_text': error_response_text[:500] if isinstance(error_response_text,
-                                                                       str) else error_response_text
+        'error_response_text': error_response_text[:500] if isinstance(error_response_text, str) else error_response_text
     }])
 
 
 def update_column_type(df_in: pd.DataFrame, column_name: str, column_type: str):
     if column_type == 'datetime':
-        return df_in[column_name].replace(['0', 0, '0000-00-00', '0000-00-00 00:00:00', ''], pd.NA).apply(
-            pd.to_datetime, utc=True, errors='coerce')
-    elif column_type in ['string', 'boolean', 'int', 'float']:
+        return df_in[column_name].replace(['0', 0, '0000-00-00', '0000-00-00 00:00:00', ''], pd.NA).apply(pd.to_datetime, utc=True, errors='coerce')
+    elif column_type in ['int', 'float']:
+        return df_in[column_name].fillna(0).astype(column_type)
+    elif column_type in ['string', 'boolean']:
         return df_in[column_name].astype(column_type)
     else:
         return df_in[column_name]
@@ -149,38 +152,29 @@ def get_1с_data(
         df = pd.DataFrame(source_for_df)
 
         if len(dict_columns) > 0:
-            df = df.rename(
-                columns={key: value[0] for key, value in dict_columns.items()}
-            )[[value[0] for value in dict_columns.values()]]
+            df = df[list(dict_columns.keys())].rename(
+                columns={nm_1c: nm_py[0] for nm_1c, nm_py in dict_columns.items()})
 
             for value in dict_columns.values():
-                df[value[0]] = update_column_type(
-                    df_in=df,
-                    column_name=value[0],
-                    column_type=value[1]
-                )
+                df[value[0]] = update_column_type(df_in=df, column_name=value[0], column_type=value[1])
 
-        if explode_column != '':
-            df_exploded = df.explode(explode_column, ignore_index=True)
-            df_normalized = pd.json_normalize(df_exploded[explode_column])
+            if explode_column != '':
+                ref_col = dict_columns['Ref_Key'][0] if 'Ref_Key' in dict_columns else 'Ref_Key'
+                df_exploded = df[[ref_col, explode_column]].explode(explode_column, ignore_index=True)
+                df_normalized = pd.json_normalize(df_exploded[explode_column])
 
-            if len(dict_explode_columns) > 0:
-                df_normalized = df_normalized.rename(
-                    columns={key: value[0] for key, value in dict_explode_columns.items()}
-                )[[value[0] for value in dict_explode_columns.values()]]
+                if len(dict_explode_columns) > 0:
+                    df_normalized = df_normalized[list(dict_explode_columns.keys())] \
+                        .rename(columns={key: value[0] for key, value in dict_explode_columns.items()})
 
-                for value in dict_explode_columns.values():
-                    df_normalized[value[0]] = update_column_type(
-                        df_in=df_normalized,
-                        column_name=value[0],
-                        column_type=value[1]
-                    )
+                    for value in dict_explode_columns.values():
+                        df_normalized[value[0]] = update_column_type(df_in=df_normalized, column_name=value[0],
+                                                                     column_type=value[1])
 
-            ref_col = dict_columns['Ref_Key'][0] if 'Ref_Key' in dict_columns else 'Ref_Key'
-            df_exploded = pd.concat([df_exploded[[ref_col]], df_normalized], axis=1)
-            df = df.drop(columns=explode_column)
+                df_exploded = pd.concat([df_exploded[[ref_col]], df_normalized], axis=1)
+                df = df.drop(columns=explode_column)
 
-            return df, df_exploded, pd.DataFrame()
+                return df, df_exploded, pd.DataFrame()
 
         return df, pd.DataFrame(), pd.DataFrame()
 
@@ -244,8 +238,8 @@ def get_1с_data_with_retry(
         explode_column: str = '',
         dict_explode_columns: dict = {},
         dttm_from_export: str = '',
-        max_retries: int = 10,
-        retry_sleep_seconds: int = 300
+        max_retries: int = MAX_RETRIES,
+        retry_sleep_seconds: int = RETRY_SLEEP_SECONDS
 ):
     for attempt in range(1, max_retries + 1):
 
@@ -308,7 +302,7 @@ def get_1с_data_with_retry(
             write_error_to_txt(f'get_1с_data error. document={document}. Script finished after 10 tries.')
             sys.exit(1)
 
-        time.sleep(retry_sleep_seconds)
+        sleep(retry_sleep_seconds)
 
     return pd.DataFrame(), pd.DataFrame()
 
@@ -341,10 +335,10 @@ def nomenclature_text_gr(nomenclature_text: str) -> str:
     elif 'трафик' in nomenclature_text:
         return 'Трафик'
     elif 'Услуги предикторов' in nomenclature_text:
-        'Услуги предикторов'
+        return 'Услуги предикторов'
     elif 'Разработка чат-бота' in nomenclature_text:
         return 'Чат бот'
-    elif 'Тест' in nomenclature_text:
+    elif 'Тест' in nomenclature_text :
         return 'Тест'
     else:
         return 'Прочее'

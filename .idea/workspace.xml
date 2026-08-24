@@ -5,7 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="ВЫПОЛНЕНО:&#10;0. в отчете инфо по лидам пришлось порезать за 2 полных последних месяца ( 2полных + текущий)&#10;1. перевести лиды с ИНН 761107378757 на 7813189404&#10;2. 7813189404 - остаток 44 460&#10;3. 2466279351 - остаток - 4 550&#10;4. 7838119825 - остаток - 1 040&#10;5. 7838119825 - проверить выставление счета по депозиту !!! -- некорректен, если оплат больше счетов !!!&#10;6. 6319262629 - остаток 11 420&#10;7. 2310223353 - остаток 40 400&#10;8. 7707458687 - остаток 0&#10;9. 2463117899 - остаток 550&#10;10. 1650438570 - остаток 1030&#10;11. 2310229806, 3900034752, 4205421649 - корректно отразить города&#10;12. 183402797459 - проверить выставление счета - сейчас корректно&#10;13. проверить почему потерялся 2465187348, 2464128734, 9703181910, 9701285618, 7733331140, 5047309883, 645055105204 - сейчас Ок&#10;&#10;&#10;К ДАШЕ:&#10;1. организовать заполнение по ИНН: 780732573031, 772919189920&#10;2. 6317163189 - сверить лиды с Ниной: у меня 95, у Даши был 91&#10;3. сбиться по депозиту не с Дашей: 241501799676&#10;4. как выставлять счет по 720306065102&#10;5. почему в лидах по ООО 'Юклиникс' инн '1' ??? должен быть 0274140585 - пока поставил затычку">
+      <change afterPath="$PROJECT_DIR$/func_new_invoices_1c.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/func_import_data_from_1c.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_import_data_from_1c.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/func_import_data_from_google.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_import_data_from_google.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/func_send_email.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_send_email.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/script1_from_1C_to_mysql.py" beforeDir="false" afterPath="$PROJECT_DIR$/script1_from_1C_to_mysql.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/script3_update_mysql_views.py" beforeDir="false" afterPath="$PROJECT_DIR$/script3_update_mysql_views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/script4_get_data_fom_mysql_and_send_email.py" beforeDir="false" afterPath="$PROJECT_DIR$/script4_get_data_fom_mysql_and_send_email.py" afterDir="false" />
     </list>
@@ -40,18 +45,18 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.2_script_from_google_to_mysql.executor": "Run",
-    "Python.4_get_data_fom_mysql_and_send_email.executor": "Run",
-    "Python._main_.executor": "Run",
-    "Python.main.executor": "Run",
-    "Python.script4_get_data_fom_mysql_and_send_email.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "main"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.2_script_from_google_to_mysql.executor&quot;: &quot;Run&quot;,
+    &quot;Python.4_get_data_fom_mysql_and_send_email.executor&quot;: &quot;Run&quot;,
+    &quot;Python._main_.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;Python.script4_get_data_fom_mysql_and_send_email.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;
   }
-}]]></component>
+}</component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>

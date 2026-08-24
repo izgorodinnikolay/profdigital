@@ -72,11 +72,42 @@ def run_get_data_fom_mysql_and_send_email():
         query=f"""select * from j28046070_sandbox.view_new_invoices order by new_invoice_flag, interval_leads_minus_invoices""",
     )
 
+    df_errors = get_df_from_db(
+        db_user=DB_USER,
+        db_password=DB_PASSWORD,
+        db_host=DB_HOST,
+        db_port=DB_PORT,
+        db_dbname=DB_DBNAME,
+        query=f"""with 
+                tmp as (
+                	select case when inn = '7840087426' then 'Кривой процесс выставления счетов - по 260к - выставляем руками'
+                				when project = 'нет инфо' then 'Заполнить инфо в Google'
+                				when project != 'Даша' then 'Пока не выставляем счета по ПМ, кроме Даши'
+                				when partner_id is not null then 'Отсутствуют данные в Catalog_Контрагенты'
+                				when contract_id is not null then 'Отсутствуют данные в Catalog_ДоговорыКонтрагентов'
+                				else 'Доработать'
+                		end as reason
+                		,inn, project, legal_entity
+                		,payment_type, deposit_min_value, deposit_average_value
+                		,interval_cnt, interval_purchase, interval_sale, interval_invoice, interval_receipt, interval_correction, interval_leads_minus_invoices, interval_deposit_balance
+                		,new_invoice_flag, new_invoice_description, new_invoice_amount
+                	from j28046070_sandbox.view_invoice_report
+                	where interval_leads_minus_invoices < deposit_min_value or new_invoice_flag = 'Да')
+                select * from tmp where reason is not null """
+    )
+
     ########################################################################################################################
 
     df_description = pd.read_excel(r'C:\Users\user\Desktop\Maks\report_description.xlsx', sheet_name='description')
 
     ########################################################################################################################
+
+    fields_new_invoices = \
+        ['inn', 'project', 'legal_entity', 'payment_type', 'deposit_min_value', 'deposit_average_value', 'interval_cnt',
+         'interval_purchase',
+         'interval_sale', 'interval_invoice', 'interval_receipt', 'interval_correction',
+         'interval_leads_minus_invoices', 'interval_deposit_balance',
+         'new_invoice_flag', 'new_invoice_description', 'new_invoice_amount']
 
     if time(9, 0) <= datetime.now().time() <= time(11, 0):
         send_email(
@@ -87,6 +118,7 @@ def run_get_data_fom_mysql_and_send_email():
             df_leads=df_leads,
             df_invoices=df_invoices,
             df_invoice_report=df_invoice_report,
-            df_new_invoices=df_new_invoices,
+            df_new_invoices=df_new_invoices[fields_new_invoices],
+            df_errors=df_errors,
             df_payment_method=df_payment_method
         )

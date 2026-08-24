@@ -3,8 +3,7 @@ import pandas as pd
 
 def update_df_single_column_type(df_in: pd.DataFrame, column_name: str, column_type: str):
     if column_type == 'datetime':
-        return df_in[column_name].replace(['0', 0, '0000-00-00', '0000-00-00 00:00:00', ''], pd.NA).apply(
-            pd.to_datetime, utc=True, errors='coerce')
+        return df_in[column_name].replace(['0', 0, '0000-00-00', '0000-00-00 00:00:00', ''], pd.NA).apply(pd.to_datetime, utc=True, errors='coerce')
     elif column_type in ['string', 'boolean', 'int', 'float']:
         return df_in[column_name].astype(column_type)
     else:

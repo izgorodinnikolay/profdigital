@@ -14,6 +14,7 @@ def send_email(
         df_invoices,
         df_invoice_report,
         df_new_invoices,
+        df_errors,
         df_payment_method
 ):
 
@@ -35,6 +36,7 @@ def send_email(
         df_invoices.to_excel(writer, sheet_name='Оплата счетов', index=False)
         df_invoice_report.to_excel(writer, sheet_name='Баланс счетов', index=False)
         df_new_invoices.to_excel(writer, sheet_name='Выставление счетов', index=False)
+        df_errors.to_excel(writer, sheet_name='Ошибки в счетах счетов', index=False)
         df_payment_method.to_excel(writer, sheet_name='Способ оплаты', index=False)
 
     excel_buffer.seek(0)

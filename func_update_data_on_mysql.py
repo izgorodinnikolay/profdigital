@@ -1,6 +1,5 @@
 from sqlalchemy import create_engine, text
 
-
 def mysql_update_view(
         db_user: str,
         db_password: str,

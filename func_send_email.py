@@ -10,8 +10,6 @@ def send_email(
         email_to: list,
         email_pass: str,
         df_description,
-        df_leads,
-        df_invoices,
         df_invoice_report,
         df_new_invoices,
         df_errors,
@@ -32,8 +30,6 @@ def send_email(
 
     with pd.ExcelWriter(excel_buffer, engine='xlsxwriter') as writer:
         df_description.to_excel(writer, sheet_name='Описание', index=False)
-        df_leads.to_excel(writer, sheet_name='Лиды', index=False)
-        df_invoices.to_excel(writer, sheet_name='Оплата счетов', index=False)
         df_invoice_report.to_excel(writer, sheet_name='Баланс счетов', index=False)
         df_new_invoices.to_excel(writer, sheet_name='Выставление счетов', index=False)
         df_errors.to_excel(writer, sheet_name='Ошибки в счетах счетов', index=False)

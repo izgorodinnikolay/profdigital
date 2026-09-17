@@ -67,7 +67,6 @@ def run_script_from_1C_to_mysql():
         'ИдентификаторРодительскойСтроки': ['parent_row_id', 'string']
     }
 
-
     df_invoices, df_invoices_detailed = get_1с_data_with_retry(
         scloud_base=SCLOUD_BASE,
         scloud_user=SCLOUD_LOGIN,
@@ -549,7 +548,7 @@ def run_script_from_1C_to_mysql():
     ########################################################################################################################
     DOCUMENT = 'Catalog_Пользователи'
     DICT_COLUMNS = {
-        'Ref_Key': ['cash_flow_article_id', 'string'],
+        'Ref_Key': ['user_id', 'string'],  # user_id
         'DeletionMark': ['is_deleted', 'boolean'],
         'Description': ['description', 'string'],
         'Недействителен': ['is_unavailable', 'boolean'],

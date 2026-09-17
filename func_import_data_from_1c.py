@@ -5,15 +5,18 @@ import sys
 from datetime import datetime, timezone
 from dotenv import load_dotenv
 from requests.auth import HTTPBasicAuth
-from sqlalchemy import create_engine, text
+from sqlalchemy import text
 from time import sleep
+from typing import Dict, List, Tuple, Optional, Any
+
+from func_common import send_telegram_message, build_engine
 
 load_dotenv(r'C:\Users\user\Desktop\Maks\projects\invoices_2026_07_26\variables.env')
 
+MAX_RETRIES = int(os.getenv("MAX_RETRIES"))
+RETRY_SLEEP_SECONDS = int(os.getenv("RETRY_SLEEP_SECONDS"))
 ERROR_LOG_FILE = os.getenv("ERROR_LOG_FILE")
 
-MAX_RETRIES = 5
-RETRY_SLEEP_SECONDS = 180
 
 def write_error_to_txt(text: str, file_name: str = ERROR_LOG_FILE):
     timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -31,9 +34,8 @@ def export_df_to_db(
         db_table: str,
         truncate: bool = True
 ):
-    engine = create_engine(
-        f'mysql+pymysql://{db_user}:{db_password}@{db_host}:{str(db_port)}/{db_dbname}'
-    )
+    engine = build_engine(db_user, db_password, db_host, db_port, db_dbname, read_timeout=300, write_timeout=300,
+                          connect_timeout=300)
 
     with engine.connect() as conn:
         conn = conn.execution_options(isolation_level="AUTOCOMMIT")
@@ -51,16 +53,16 @@ def export_df_to_db(
 
 
 def export_df_to_db_with_retry(
-    df_src: pd.DataFrame,
-    db_user: str,
-    db_password: str,
-    db_host: str,
-    db_port: int,
-    db_dbname: str,
-    db_table: str,
-    truncate: bool = True,
-    max_retries: int = MAX_RETRIES,
-    retry_sleep_seconds: int = RETRY_SLEEP_SECONDS
+        df_src: pd.DataFrame,
+        db_user: str,
+        db_password: str,
+        db_host: str,
+        db_port: int,
+        db_dbname: str,
+        db_table: str,
+        truncate: bool = True,
+        max_retries: int = MAX_RETRIES,
+        retry_sleep_seconds: int = RETRY_SLEEP_SECONDS
 ):
     for attempt in range(1, max_retries + 1):
         try:
@@ -82,6 +84,8 @@ def export_df_to_db_with_retry(
             )
 
             if attempt >= max_retries:
+                msg = f'Function = export_df_to_db_with_retry. Table = {db_dbname}.{db_table} . Script FAILED after {MAX_RETRIES} tries.'
+                send_telegram_message(message=msg)
                 write_error_to_txt(f'script finished after {max_retries} tries')
                 sys.exit(1)
 
@@ -91,11 +95,11 @@ def export_df_to_db_with_retry(
 
 
 def build_status_df(
-    document: str,
-    status: str,
-    error_type=None,
-    error_text=None,
-    error_response_text=None
+        document: str,
+        status: str,
+        error_type=None,
+        error_text=None,
+        error_response_text=None
 ) -> pd.DataFrame:
     return pd.DataFrame([{
         'document': document,
@@ -103,13 +107,36 @@ def build_status_df(
         'status': status,
         'error_type': error_type,
         'error_text': error_text,
-        'error_response_text': error_response_text[:500] if isinstance(error_response_text, str) else error_response_text
+        'error_response_text': error_response_text[:500] if isinstance(error_response_text,
+                                                                       str) else error_response_text
     }])
+
+
+def _build_failure_status_df(document, exception, response=None):
+    if isinstance(exception, requests.exceptions.HTTPError):
+        error_type = 'HTTP'
+    elif isinstance(exception, requests.exceptions.ConnectionError):
+        error_type = 'Connection'
+    elif isinstance(exception, ValueError):
+        error_type = 'JSON'
+    else:
+        error_type = 'Other'
+
+    error_response_text = response.text[:500] if response is not None else ''
+
+    return build_status_df(
+        document=document,
+        status='failure',
+        error_type=error_type,
+        error_text=str(exception),
+        error_response_text=error_response_text
+    )
 
 
 def update_column_type(df_in: pd.DataFrame, column_name: str, column_type: str):
     if column_type == 'datetime':
-        return df_in[column_name].replace(['0', 0, '0000-00-00', '0000-00-00 00:00:00', ''], pd.NA).apply(pd.to_datetime, utc=True, errors='coerce')
+        return df_in[column_name].replace(['0', 0, '0000-00-00', '0000-00-00 00:00:00', ''], pd.NA).apply(
+            pd.to_datetime, utc=True, errors='coerce')
     elif column_type in ['int', 'float']:
         return df_in[column_name].fillna(0).astype(column_type)
     elif column_type in ['string', 'boolean']:
@@ -123,18 +150,40 @@ def get_1с_data(
         scloud_user: str,
         scloud_password: str,
         document: str,
-        dict_columns: dict = {},
+        dict_columns: Optional[Dict[str, List[Any]]] = None,
         explode_column: str = '',
-        dict_explode_columns: dict = {},
+        dict_explode_columns: Optional[Dict[str, List[Any]]] = None,
         dttm_from_export: str = ''
-):
-    url = f'{scloud_base}/{document}'
+) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    """
+    Получает данные из API 1С, нормализует и возвращает:
+    - основной DataFrame,
+    - exploded DataFrame (если задана колонка для разворота),
+    - DataFrame со статусом ошибки (при сбое).
+    """
+    # Безопасные значения по умолчанию
+    dict_columns = dict_columns or {}
+    dict_explode_columns = dict_explode_columns or {}
+
+    # Формируем URL и параметры
+    url = f"{scloud_base.rstrip('/')}/{document.lstrip('/')}"
     headers = {'Accept': 'application/json'}
-    response = None
-    params = dict()
-    params['$format'] = 'json'
-    if dict_columns != {}: params['$select'] = ','.join(dict_columns.keys())
-    if dttm_from_export != '': params['$filter'] = f"Date gt datetime'{dttm_from_export}'"
+    params = {'$format': 'json'}
+
+    if dict_columns:
+        params['$select'] = ','.join(dict_columns.keys())
+    if dttm_from_export:
+        params['$filter'] = f"Date gt datetime'{dttm_from_export}'"
+
+    # Инициализируем пустые DataFrame для возврата при ошибке
+    empty_df = pd.DataFrame()
+    status_df = build_status_df(
+        document=document,
+        status='failure',
+        error_type='Error',
+        error_text='Unknown error',
+        error_response_text=''
+    )
 
     try:
         response = requests.get(
@@ -144,83 +193,74 @@ def get_1с_data(
             auth=HTTPBasicAuth(scloud_user, scloud_password),
             timeout=30
         )
-
         response.raise_for_status()
-
         data = response.json()
-        source_for_df = data.get('value', data)
-        df = pd.DataFrame(source_for_df)
+        df_raw = pd.DataFrame(data.get('value', data))
 
-        if len(dict_columns) > 0:
-            df = df[list(dict_columns.keys())].rename(
-                columns={nm_1c: nm_py[0] for nm_1c, nm_py in dict_columns.items()})
+        if not dict_columns:
+            # Если выборка колонок не задана, возвращаем всё как есть
+            return df_raw, empty_df, empty_df
 
-            for value in dict_columns.values():
-                df[value[0]] = update_column_type(df_in=df, column_name=value[0], column_type=value[1])
+        # 1. Переименование и выборка колонок
+        old_to_new = {old: new[0] for old, new in dict_columns.items()}
+        df = df_raw[list(old_to_new.keys())].rename(columns=old_to_new)
 
-            if explode_column != '':
-                ref_col = dict_columns['Ref_Key'][0] if 'Ref_Key' in dict_columns else 'Ref_Key'
-                df_exploded = df[[ref_col, explode_column]].explode(explode_column, ignore_index=True)
-                df_normalized = pd.json_normalize(df_exploded[explode_column])
+        # 2. Приведение типов
+        for new_col, col_info in dict_columns.items():
+            # new_col здесь — новое имя (из old_to_new), но лучше брать из values
+            # Используем значение из словаря: new_name = col_info[0]
+            new_name = col_info[0]
+            col_type = col_info[1]
+            df[new_name] = update_column_type(
+                df_in=df,
+                column_name=new_name,
+                column_type=col_type
+            )
 
-                if len(dict_explode_columns) > 0:
-                    df_normalized = df_normalized[list(dict_explode_columns.keys())] \
-                        .rename(columns={key: value[0] for key, value in dict_explode_columns.items()})
+        # 3. Обработка explode-колонки
+        if explode_column:
+            # Определяем колонку Ref_Key (индекс или из словаря)
+            ref_col = dict_columns.get('Ref_Key', [None])[0] or 'Ref_Key'
+            # Убеждаемся, что ref_col существует
+            if ref_col not in df.columns:
+                raise ValueError(f"Ref column '{ref_col}' not found in DataFrame")
 
-                    for value in dict_explode_columns.values():
-                        df_normalized[value[0]] = update_column_type(df_in=df_normalized, column_name=value[0],
-                                                                     column_type=value[1])
+            # Разворачиваем список в отдельные строки
+            df_exploded = df[[ref_col, explode_column]].explode(explode_column, ignore_index=True)
 
-                df_exploded = pd.concat([df_exploded[[ref_col]], df_normalized], axis=1)
-                df = df.drop(columns=explode_column)
+            # Нормализуем JSON-объекты в exploded-колонке
+            df_normalized = pd.json_normalize(df_exploded[explode_column])
 
-                return df, df_exploded, pd.DataFrame()
+            # Если заданы спецификации для exploded-колонок, применяем их
+            if dict_explode_columns:
+                # Оставляем только нужные колонки и переименовываем
+                df_normalized = df_normalized[list(dict_explode_columns.keys())]
+                df_normalized = df_normalized.rename(
+                    columns={col: spec[0] for col, spec in dict_explode_columns.items()}
+                )
+                # Приводим типы
+                for _, spec in dict_explode_columns.items():
+                    df_normalized[spec[0]] = update_column_type(df_in=df_normalized,
+                                                                column_name=spec[0],
+                                                                column_type=spec[1]
+                                                                )
 
-        return df, pd.DataFrame(), pd.DataFrame()
+            # Соединяем exploded-данные с ref_col
+            df_exploded_final = pd.concat(
+                [df_exploded[[ref_col]], df_normalized],
+                axis=1
+            )
 
-    except requests.exceptions.HTTPError as e:
-        response_text = response.text[:500] if response is not None else ''
-        status_df = build_status_df(
-            document=document,
-            status='failure',
-            error_type='HTTP',
-            error_text=str(e),
-            error_response_text=response_text
-        )
-        return pd.DataFrame(), pd.DataFrame(), status_df
+            # Убираем исходную explode-колонку из основного df
+            df = df.drop(columns=explode_column)
 
-    except requests.exceptions.ConnectionError as e:
-        response_text = response.text[:500] if response is not None else None
-        status_df = build_status_df(
-            document=document,
-            status='failure',
-            error_type='Connection',
-            error_text=str(e),
-            error_response_text=response_text
-        )
-        return pd.DataFrame(), pd.DataFrame(), status_df
+            return df, df_exploded_final, empty_df
 
-    except ValueError as e:
-        response_text = response.text[:500] if response is not None else None
-        status_df = build_status_df(
-            document=document,
-            status='failure',
-            error_type='JSON',
-            error_text=str(e),
-            error_response_text=response_text
-        )
-        return pd.DataFrame(), pd.DataFrame(), status_df
+        return df, empty_df, empty_df
 
     except Exception as e:
-        response_text = response.text[:500] if response is not None else None
-        status_df = build_status_df(
-            document=document,
-            status='failure',
-            error_type='other',
-            error_text=str(e),
-            error_response_text=response_text
-        )
-        return pd.DataFrame(), pd.DataFrame(), status_df
+        status_df = _build_failure_status_df(document, e, response=response)
+        return empty_df, empty_df, status_df
 
 
 def get_1с_data_with_retry(
@@ -299,7 +339,9 @@ def get_1с_data_with_retry(
         )
 
         if attempt >= max_retries:
-            write_error_to_txt(f'get_1с_data error. document={document}. Script finished after 10 tries.')
+            msg = f'Function = get_1с_data_with_retry. Document={document}. Script FAILED after {MAX_RETRIES} tries.'
+            send_telegram_message(message=msg)
+            write_error_to_txt(msg)
             sys.exit(1)
 
         sleep(retry_sleep_seconds)
@@ -317,7 +359,7 @@ def nomenclature_text_gr(nomenclature_text: str) -> str:
     elif 'абинета ВК' in nomenclature_text:
         return 'ВК'
     elif 'нтеграц' in nomenclature_text or 'Подключение к агрегатору' in nomenclature_text:
-        return 'Интеграця'
+        return 'Интеграция'
     elif 'Контекст' in nomenclature_text:
         return 'Контекстная реклама'
     elif 'Оплата стоимости лидов' in nomenclature_text or 'Флоктори' in nomenclature_text or 'RIS PROMO' in nomenclature_text:

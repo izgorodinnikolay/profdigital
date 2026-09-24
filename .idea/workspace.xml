@@ -4,17 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="test">
-      <change afterPath="$PROJECT_DIR$/func_common.py" afterDir="false" />
+    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="+ переписать/оптимизировать скрипты на стороне mysql&#10;+ поправить корректирующие суммы по депозитам&#10;+ выставлять счета по депозитам в течение недели&#10;+ заполнять комментарий Александрит и массаж в счетах по АЛЭ и РМ&#10;+ поправить НДС&#10;+ добавить штуки и цену по недепозиту&#10;+ дорабатывать процесс выставления счетов: если был удаленный счет, тоже не выставляем&#10;+ поставить ретраи на mysql_update_view&#10;+ уведомления в ТГ&#10;+ повыкидывать лиды и счета из отчета">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_main_.py" beforeDir="false" afterPath="$PROJECT_DIR$/_main_.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/func_common.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_common.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/func_import_data_from_1c.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_import_data_from_1c.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/func_import_data_from_google.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_import_data_from_google.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/func_import_data_from_mysql.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_import_data_from_mysql.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/func_new_invoices_1c.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_new_invoices_1c.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/func_send_email.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_send_email.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/func_update_data_on_mysql.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_update_data_on_mysql.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/script1_from_1C_to_mysql.py" beforeDir="false" afterPath="$PROJECT_DIR$/script1_from_1C_to_mysql.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/script2_from_google_to_mysql.py" beforeDir="false" afterPath="$PROJECT_DIR$/script2_from_google_to_mysql.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/script3_update_mysql_views.py" beforeDir="false" afterPath="$PROJECT_DIR$/script3_update_mysql_views.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/script4_get_data_fom_mysql_and_send_email.py" beforeDir="false" afterPath="$PROJECT_DIR$/script4_get_data_fom_mysql_and_send_email.py" afterDir="false" />
     </list>
@@ -55,7 +53,10 @@
     "Python.4_get_data_fom_mysql_and_send_email.executor": "Run",
     "Python._main_.executor": "Run",
     "Python.func_common.executor": "Run",
+    "Python.func_import_data_from_1c.executor": "Run",
+    "Python.func_new_invoices_1c.executor": "Run",
     "Python.main.executor": "Run",
+    "Python.script1_from_1C_to_mysql.executor": "Run",
     "Python.script4_get_data_fom_mysql_and_send_email.executor": "Run",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -142,7 +143,15 @@
       <option name="project" value="LOCAL" />
       <updated>1787601317231</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="+ переписать/оптимизировать скрипты на стороне mysql&#10;+ поправить корректирующие суммы по депозитам&#10;+ выставлять счета по депозитам в течение недели&#10;+ заполнять комментарий Александрит и массаж в счетах по АЛЭ и РМ&#10;+ поправить НДС&#10;+ добавить штуки и цену по недепозиту&#10;+ дорабатывать процесс выставления счетов: если был удаленный счет, тоже не выставляем&#10;+ поставить ретраи на mysql_update_view&#10;+ уведомления в ТГ&#10;+ повыкидывать лиды и счета из отчета">
+      <option name="closed" value="true" />
+      <created>1789631347643</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1789631347643</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -152,6 +161,7 @@
     <MESSAGE value="в mysql_update_view добавлен аргумент truncate" />
     <MESSAGE value="восстановил variables.env" />
     <MESSAGE value="test" />
-    <option name="LAST_COMMIT_MESSAGE" value="test" />
+    <MESSAGE value="+ переписать/оптимизировать скрипты на стороне mysql&#10;+ поправить корректирующие суммы по депозитам&#10;+ выставлять счета по депозитам в течение недели&#10;+ заполнять комментарий Александрит и массаж в счетах по АЛЭ и РМ&#10;+ поправить НДС&#10;+ добавить штуки и цену по недепозиту&#10;+ дорабатывать процесс выставления счетов: если был удаленный счет, тоже не выставляем&#10;+ поставить ретраи на mysql_update_view&#10;+ уведомления в ТГ&#10;+ повыкидывать лиды и счета из отчета" />
+    <option name="LAST_COMMIT_MESSAGE" value="+ переписать/оптимизировать скрипты на стороне mysql&#10;+ поправить корректирующие суммы по депозитам&#10;+ выставлять счета по депозитам в течение недели&#10;+ заполнять комментарий Александрит и массаж в счетах по АЛЭ и РМ&#10;+ поправить НДС&#10;+ добавить штуки и цену по недепозиту&#10;+ дорабатывать процесс выставления счетов: если был удаленный счет, тоже не выставляем&#10;+ поставить ретраи на mysql_update_view&#10;+ уведомления в ТГ&#10;+ повыкидывать лиды и счета из отчета" />
   </component>
 </project>

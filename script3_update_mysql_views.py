@@ -4,7 +4,7 @@ from func_update_data_on_mysql import mysql_update_view_with_retry
 
 def run_script_update_mysql_views():
 
-    load_dotenv(r'C:\Users\user\Desktop\Maks\projects\invoices_2026_07_26\variables.env')
+    load_dotenv('variables.env')
 
     ########################################################################################################################
     # VARIABLES
@@ -19,6 +19,8 @@ def run_script_update_mysql_views():
     MAX_RETRIES = int(os.getenv("MAX_RETRIES"))
     RETRY_SLEEP_SECONDS = int(os.getenv("RETRY_SLEEP_SECONDS"))
 
+    print(f'starting run_script_update_mysql_views')
+
     ########################################################################################################################
     TBL_DB = 'j28046070_sandbox'
     TBL_NAME = 'view_leads'
@@ -29,7 +31,7 @@ def run_script_update_mysql_views():
     	,case when l.inn = '720307197077' then '2463115644'
               when l.inn = '761107378757' then '760212666248'
     	      when length(l.inn) in (9, 11) then concat('0', l.inn) else l.inn end as inn
-    	,case when l.inn in ('2310229806', '3900034752', '4205421649') then l.city else '' end as city_invoice
+    	,case when l.inn in ('2310229806', '3900034752', '4205421649', '7727471830') then l.city else '' end as city_invoice
     	,case when l.inn in ('9701285618','7733331140','5047309883','9713010350','9703181910') then 
     			case when l.source like 'АЛЭ%%' then 'АЛЭ'
     				 when l.source like 'ЛЭ%%' then 'ЛЭ'
@@ -40,7 +42,7 @@ def run_script_update_mysql_views():
     	,l.branch, l.sendStatus, l.sendDateTime, l.purchase, l.sale
     	,case when row_number() 
     			   over(partition by l.inn, l.phone, l.source, 
-    	                             case when l.inn in ('2310229806', '3900034752', '4205421649') then l.city else '' end,
+    	                             case when l.inn in ('2310229806', '3900034752', '4205421649', '7727471830') then l.city else '' end,
     	                             l.dateAdd - INTERVAL (DAY(l.dateAdd) - 1) DAY 
     	                order by l.dateTimeAdd
     	               ) > 1 then 'Дубликат' else '' end as duplicateFlag
@@ -207,6 +209,8 @@ def run_script_update_mysql_views():
               when p.partner_inn = '3900034752' and p.partner_name = 'СТОМАТОЛОГИЯ КАЛИНИНГРАД ООО' then 'Калининград'
               when p.partner_inn = '4205421649' and p.partner_name = 'ООО КОМАНДА МЕЧТЫ КЕМЕРОВО' then 'Кемерово'
               when p.partner_inn = '4205421649' and p.partner_name = 'ООО КОМАНДА МЕЧТЫ КЕМЕРОВО Новокузнецк' then 'Новокузнецк'
+              when p.partner_inn = '7727471830' and p.partner_name = 'ЕВРОМЕД Екб ООО' then 'Екатеринбург'
+              when p.partner_inn = '7727471830' and p.partner_name = 'ЕВРОМЕД ООО' then 'Москва'
               else '' end as city_invoice
     	,case when p.partner_inn in ('9701285618','7733331140','5047309883','9713010350','9703181910') then 
     		case when i.invoice_comment = 'Александрит' then 'АЛЭ'
@@ -270,14 +274,14 @@ def run_script_update_mysql_views():
     with 
     leads_groupped as (
     	select vl.inn, vl.city_invoice, vl.source_invoice
-    		,count(*) as total_cnt
+    		,sum(case when vl.sale > 0 then 1 else 0 end) as total_cnt
     		,max(vl.dateTimeAdd) as last_lead_dttm
     		,sum(vl.purchase) as total_purchase
     		,sum(vl.sale) as total_sale
-    		,sum(case when vl.dateAdd between pmi.leads_start and pmi.leads_end then 1 else 0 end) as interval_cnt
+    		,sum(case when vl.sale > 0 and vl.dateAdd between pmi.leads_start and pmi.leads_end then 1 else 0 end) as interval_cnt
     		,sum(case when vl.dateAdd between pmi.leads_start and pmi.leads_end then vl.purchase else 0 end) as interval_purchase
     		,sum(case when vl.dateAdd between pmi.leads_start and pmi.leads_end then vl.sale else 0 end) as interval_sale
-    		,sum(case when vl.dateAdd between pmi.leads_prev_start and pmi.leads_prev_end then 1 else 0 end) as prev_cnt
+    		,sum(case when vl.sale > 0 and vl.dateAdd between pmi.leads_prev_start and pmi.leads_prev_end then 1 else 0 end) as prev_cnt
     		,sum(case when vl.dateAdd between pmi.leads_prev_start and pmi.leads_prev_end then vl.purchase else 0 end) as prev_purchase
     		,sum(case when vl.dateAdd between pmi.leads_prev_start and pmi.leads_prev_end then vl.sale else 0 end) as prev_sale
     	from j28046070_sandbox.view_leads as vl 
@@ -328,6 +332,8 @@ def run_script_update_mysql_views():
     			  	  when p.partner_inn = '3900034752' and p.partner_name = 'СТОМАТОЛОГИЯ КАЛИНИНГРАД ООО' then 'Калининград'
     			  	  when p.partner_inn = '4205421649' and p.partner_name = 'ООО КОМАНДА МЕЧТЫ КЕМЕРОВО' then 'Кемерово'
     			  	  when p.partner_inn = '4205421649' and p.partner_name = 'ООО КОМАНДА МЕЧТЫ КЕМЕРОВО Новокузнецк' then 'Новокузнецк' 
+                      when p.partner_inn = '7727471830' and p.partner_name = 'ЕВРОМЕД Екб ООО' then 'Екатеринбург'
+                      when p.partner_inn = '7727471830' and p.partner_name = 'ЕВРОМЕД ООО' then 'Москва'
     			   	  else '' end as city_invoice
     			,row_number() over(
     				partition by partner_inn,
@@ -338,6 +344,8 @@ def run_script_update_mysql_views():
     					  	 when p.partner_inn = '3900034752' and p.partner_name = 'СТОМАТОЛОГИЯ КАЛИНИНГРАД ООО' then 'Калининград'
     					  	 when p.partner_inn = '4205421649' and p.partner_name = 'ООО КОМАНДА МЕЧТЫ КЕМЕРОВО' then 'Кемерово'
     					  	 when p.partner_inn = '4205421649' and p.partner_name = 'ООО КОМАНДА МЕЧТЫ КЕМЕРОВО Новокузнецк' then 'Новокузнецк' 
+                             when p.partner_inn = '7727471830' and p.partner_name = 'ЕВРОМЕД Екб ООО' then 'Екатеринбург'
+                             when p.partner_inn = '7727471830' and p.partner_name = 'ЕВРОМЕД ООО' then 'Москва'
     					   	 else '' end
     				order by partner_name
     				) rn

@@ -51,6 +51,8 @@ def mysql_update_view_with_retry(
         max_retries: int = 5,
         retry_sleep_seconds: int = 30
 ):
+    print(f'  update data on ProfDigital {tbl_db}.{tbl_name}')
+
     for attempt in range(1, max_retries + 1):
         try:
             mysql_update_view(

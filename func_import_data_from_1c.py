@@ -11,7 +11,7 @@ from typing import Dict, List, Tuple, Optional, Any
 
 from func_common import send_telegram_message, build_engine
 
-load_dotenv(r'C:\Users\user\Desktop\Maks\projects\invoices_2026_07_26\variables.env')
+load_dotenv('variables.env')
 
 MAX_RETRIES = int(os.getenv("MAX_RETRIES"))
 RETRY_SLEEP_SECONDS = int(os.getenv("RETRY_SLEEP_SECONDS"))
@@ -64,6 +64,9 @@ def export_df_to_db_with_retry(
         max_retries: int = MAX_RETRIES,
         retry_sleep_seconds: int = RETRY_SLEEP_SECONDS
 ):
+    if db_table != 'status_1c':
+        print(f'  load data to ProfDigital {db_dbname}.{db_table}')
+
     for attempt in range(1, max_retries + 1):
         try:
             export_df_to_db(
@@ -161,6 +164,9 @@ def get_1с_data(
     - exploded DataFrame (если задана колонка для разворота),
     - DataFrame со статусом ошибки (при сбое).
     """
+
+    response = None
+
     # Безопасные значения по умолчанию
     dict_columns = dict_columns or {}
     dict_explode_columns = dict_explode_columns or {}
@@ -191,7 +197,7 @@ def get_1с_data(
             headers=headers,
             params=params,
             auth=HTTPBasicAuth(scloud_user, scloud_password),
-            timeout=30
+            timeout=90
         )
         response.raise_for_status()
         data = response.json()
@@ -281,6 +287,8 @@ def get_1с_data_with_retry(
         max_retries: int = MAX_RETRIES,
         retry_sleep_seconds: int = RETRY_SLEEP_SECONDS
 ):
+    print(f'  upload data from 1C {document}')
+
     for attempt in range(1, max_retries + 1):
 
         df, df_exploded, status_df = get_1с_data(

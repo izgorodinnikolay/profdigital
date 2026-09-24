@@ -5,26 +5,46 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 
 
-load_dotenv(r'C:\Users\user\Desktop\Maks\projects\invoices_2026_07_26\variables.env')
+load_dotenv('variables.env')
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 BOT_CHAT_ID = os.getenv("BOT_CHAT_ID")
+PROXY = os.getenv("PROXY")
 
+def send_telegram_message(token: str = BOT_TOKEN,
+                          chat_id: str = BOT_CHAT_ID,
+                          message: str = 'Процесс обновления счетов упал',
+                          proxy_url: str = PROXY  # Добавили аргумент для прокси
+                          ) -> None:
+    """Отправляет сообщение в Telegram через прокси."""
+    # Инициализируем переменную response заранее, чтобы избежать UnboundLocalError в блоке except
+    response = None
+    try:
+        url = f"https://api.telegram.org/bot{token}/sendMessage"
+        payload = {
+            "chat_id": chat_id,
+            "text": message,
+            "parse_mode": "Markdown",
+        }
 
-def send_telegram_message(token: str = BOT_TOKEN, chat_id: str = BOT_CHAT_ID,
-                          message: str = 'Процесс обновления счетов упал') -> None:
-    """Отправляет сообщение в Telegram. Возвращает True при успехе."""
+        # Формируем словарь прокси, если proxy_url передан
+        proxies = None
+        if proxy_url:
+            proxies = {
+                "http": proxy_url,
+                "https": proxy_url
+            }
 
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-    payload = {
-        "chat_id": chat_id,
-        "text": message,
-        "parse_mode": "Markdown",
-    }
+        # Передаем proxies в запрос
+        response = requests.post(url, json=payload, timeout=10, proxies=proxies)
+        response.raise_for_status()
 
-    response = requests.post(url, json=payload, timeout=10)
-    response.raise_for_status()
-
+    except Exception as e:
+        if response is not None:
+            print(f"❌ Ошибка Telegram API: {response.text}")
+        else:
+            print(f"❌ Сетевая ошибка (возможно, прокси недоступен): {e}")
+        raise e
 
 def build_engine(
     db_user: str,

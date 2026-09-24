@@ -9,123 +9,124 @@ from func_new_invoices_1c import create_invoice_on_1c
 
 def run_get_data_fom_mysql_and_send_email():
 
-    try:
+    # try:
 
-        load_dotenv(r'C:\Users\user\Desktop\Maks\projects\invoices_2026_07_26\variables.env')
+    load_dotenv('variables.env')
 
-        ########################################################################################################################
-        # VARIABLES
+    ########################################################################################################################
+    # VARIABLES
 
-        # MySQL
-        DB_HOST = os.getenv("DB_HOST")
-        DB_PORT = int(os.getenv("DB_PORT"))
-        DB_USER = os.getenv("DB_USER")
-        DB_PASSWORD = os.getenv("DB_PASSWORD")
-        DB_DBNAME = os.getenv("DB_DBNAME")
-        DB_SUPER_USER = os.getenv("DB_SUPER_USER")
+    # MySQL
+    DB_HOST = os.getenv("DB_HOST")
+    DB_PORT = int(os.getenv("DB_PORT"))
+    DB_USER = os.getenv("DB_USER")
+    DB_PASSWORD = os.getenv("DB_PASSWORD")
+    DB_DBNAME = os.getenv("DB_DBNAME")
+    DB_SUPER_USER = os.getenv("DB_SUPER_USER")
 
-        # 1C
-        SCLOUD_LOGIN = os.getenv("SCLOUD_LOGIN")
-        SCLOUD_PASSWORD = os.getenv("SCLOUD_PASSWORD")
-        SCLOUD_BASE = os.getenv("SCLOUD_BASE")
+    # 1C
+    SCLOUD_LOGIN = os.getenv("SCLOUD_LOGIN")
+    SCLOUD_PASSWORD = os.getenv("SCLOUD_PASSWORD")
+    SCLOUD_BASE = os.getenv("SCLOUD_BASE")
 
-        # email
-        EMAIL_FROM = os.getenv("EMAIL_FROM")
-        EMAIL_TO = [item.strip() for item in os.getenv("EMAIL_TO", "").split(",") if item]
-        EMAIL_PASS = os.getenv("EMAIL_PASS")
+    # email
+    EMAIL_FROM = os.getenv("EMAIL_FROM")
+    EMAIL_TO = [item.strip() for item in os.getenv("EMAIL_TO", "").split(",") if item]
+    EMAIL_PASS = os.getenv("EMAIL_PASS")
 
-        ########################################################################################################################
+    print(f'starting run_script_update_mysql_views')
 
+    ########################################################################################################################
 
-        df_invoice_report = get_df_from_db(
-            db_user=DB_USER,
-            db_password=DB_PASSWORD,
-            db_host=DB_HOST,
-            db_port=DB_PORT,
-            db_dbname=DB_DBNAME,
-            query=f"""select * from j28046070_sandbox.view_invoice_report order by interval_leads_minus_invoices""",
-        )
+    df_invoice_report = get_df_from_db(
+        db_user=DB_USER,
+        db_password=DB_PASSWORD,
+        db_host=DB_HOST,
+        db_port=DB_PORT,
+        db_dbname=DB_DBNAME,
+        query=f"""select * from j28046070_sandbox.view_invoice_report order by interval_leads_minus_invoices""",
+    )
 
-        df_payment_method = get_df_from_db(
-            db_user=DB_USER,
-            db_password=DB_PASSWORD,
-            db_host=DB_HOST,
-            db_port=DB_PORT,
-            db_dbname=DB_DBNAME,
-            query=f"""select * from j28046070_sandbox.view_payment_method""",
-        )
+    df_payment_method = get_df_from_db(
+        db_user=DB_USER,
+        db_password=DB_PASSWORD,
+        db_host=DB_HOST,
+        db_port=DB_PORT,
+        db_dbname=DB_DBNAME,
+        query=f"""select * from j28046070_sandbox.view_payment_method""",
+    )
 
-        df_new_invoices = get_df_from_db(
-            db_user=DB_USER,
-            db_password=DB_PASSWORD,
-            db_host=DB_HOST,
-            db_port=DB_PORT,
-            db_dbname=DB_DBNAME,
-            query=f"""select * from j28046070_sandbox.view_new_invoices order by new_invoice_flag, interval_leads_minus_invoices""",
-        )
+    df_new_invoices = get_df_from_db(
+        db_user=DB_USER,
+        db_password=DB_PASSWORD,
+        db_host=DB_HOST,
+        db_port=DB_PORT,
+        db_dbname=DB_DBNAME,
+        query=f"""select * from j28046070_sandbox.view_new_invoices order by new_invoice_flag, interval_leads_minus_invoices""",
+    )
 
-        df_errors = get_df_from_db(
-            db_user=DB_USER,
-            db_password=DB_PASSWORD,
-            db_host=DB_HOST,
-            db_port=DB_PORT,
-            db_dbname=DB_DBNAME,
-            query=f"""with 
-                    tmp as (
-                        select case when inn = '7840087426' then 'Кривой процесс выставления счетов - по 260к - выставляем руками'
-                                    when project = 'нет инфо' then 'Заполнить инфо в Google'
-                                    when project != 'Даша' then 'Пока не выставляем счета по ПМ, кроме Даши'
-                                    when partner_id is not null then 'Отсутствуют данные в Catalog_Контрагенты'
-                                    when contract_id is not null then 'Отсутствуют данные в Catalog_ДоговорыКонтрагентов'
-                                    else 'Доработать'
-                            end as reason
-                            ,inn, project, legal_entity
-                            ,payment_type, deposit_min_value, deposit_average_value
-                            ,interval_cnt, interval_purchase, interval_sale, interval_invoice, interval_receipt, interval_correction, interval_leads_minus_invoices, interval_deposit_balance
-                            ,new_invoice_flag, new_invoice_description, new_invoice_amount
-                        from j28046070_sandbox.view_invoice_report
-                        where interval_leads_minus_invoices < deposit_min_value or new_invoice_flag = 'Да')
-                    select * from tmp where reason is not null """
-        )
+    df_errors = get_df_from_db(
+        db_user=DB_USER,
+        db_password=DB_PASSWORD,
+        db_host=DB_HOST,
+        db_port=DB_PORT,
+        db_dbname=DB_DBNAME,
+        query=f"""with 
+                tmp as (
+                    select case when inn = '7840087426' then 'Кривой процесс выставления счетов - по 260к - выставляем руками'
+                                when project = 'нет инфо' then 'Заполнить инфо в Google'
+                                when project != 'Даша' then 'Пока не выставляем счета по ПМ, кроме Даши'
+                                when partner_id is not null then 'Отсутствуют данные в Catalog_Контрагенты'
+                                when contract_id is not null then 'Отсутствуют данные в Catalog_ДоговорыКонтрагентов'
+                                else 'Доработать'
+                        end as reason
+                        ,inn, project, legal_entity
+                        ,payment_type, deposit_min_value, deposit_average_value
+                        ,interval_cnt, interval_purchase, interval_sale, interval_invoice, interval_receipt, interval_correction, interval_leads_minus_invoices, interval_deposit_balance
+                        ,new_invoice_flag, new_invoice_description, new_invoice_amount
+                    from j28046070_sandbox.view_invoice_report
+                    where interval_leads_minus_invoices < deposit_min_value or new_invoice_flag = 'Да')
+                select * from tmp where reason is not null """
+    )
 
-        ########################################################################################################################
+    ########################################################################################################################
 
-        df_description = pd.read_excel(r'C:\Users\user\Desktop\Maks\report_description.xlsx', sheet_name='description')
+    df_description = pd.read_excel(r'C:\Users\user\Desktop\Maks\report_description.xlsx', sheet_name='description')
 
-        ########################################################################################################################
+    ########################################################################################################################
 
-        fields_new_invoices = \
-            ['inn', 'project', 'legal_entity', 'payment_type', 'deposit_min_value', 'deposit_average_value',
-             'interval_cnt',
-             'interval_purchase',
-             'interval_sale', 'interval_invoice', 'interval_receipt', 'interval_correction',
-             'interval_leads_minus_invoices', 'interval_deposit_balance',
-             'new_invoice_flag', 'new_invoice_description', 'new_invoice_amount']
+    fields_new_invoices = \
+        ['inn', 'project', 'legal_entity', 'payment_type', 'deposit_min_value', 'deposit_average_value',
+         'interval_cnt',
+         'interval_purchase',
+         'interval_sale', 'interval_invoice', 'interval_receipt', 'interval_correction',
+         'interval_leads_minus_invoices', 'interval_deposit_balance',
+         'new_invoice_flag', 'new_invoice_description', 'new_invoice_amount']
 
-        send_email(
-            email_from=EMAIL_FROM,
-            email_to=EMAIL_TO,
-            email_pass=EMAIL_PASS,
-            df_description=df_description,
-            df_invoice_report=df_invoice_report,
-            df_new_invoices=df_new_invoices[fields_new_invoices],
-            df_errors=df_errors,
-            df_payment_method=df_payment_method
-        )
+    send_email(
+        email_from=EMAIL_FROM,
+        email_to=EMAIL_TO,
+        email_pass=EMAIL_PASS,
+        df_description=df_description,
+        df_invoice_report=df_invoice_report,
+        df_new_invoices=df_new_invoices[fields_new_invoices],
+        df_errors=df_errors,
+        df_payment_method=df_payment_method
+    )
 
-        if len(df_new_invoices) > 0:
-            create_invoice_on_1c_results = \
-                create_invoice_on_1c(
-                    scloud_base=SCLOUD_BASE,
-                    scloud_login=SCLOUD_LOGIN,
-                    scloud_password=SCLOUD_PASSWORD,
-                    df_new_invoices=df_new_invoices
-                )
-        else:
-            create_invoice_on_1c_results = {}
+    if len(df_new_invoices) > 0:
+        create_invoice_on_1c_results = \
+            create_invoice_on_1c(
+                scloud_base=SCLOUD_BASE,
+                scloud_login=SCLOUD_LOGIN,
+                scloud_password=SCLOUD_PASSWORD,
+                df_new_invoices=df_new_invoices
+            )
+    else:
+        create_invoice_on_1c_results = {}
 
-        return create_invoice_on_1c_results
+    return create_invoice_on_1c_results
 
-    except:
-
-        send_telegram_message(message = 'Процесс упал на этапе выставления счетов')
+    # except:
+    #
+    #     send_telegram_message(message = 'Процесс упал на этапе выставления счетов')

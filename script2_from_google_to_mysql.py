@@ -5,7 +5,7 @@ from func_import_data_from_1c import export_df_to_db_with_retry
 
 def run_script_from_google_to_mysql():
 
-    load_dotenv(r'C:\Users\user\Desktop\Maks\projects\invoices_2026_07_26\variables.env')
+    load_dotenv('variables.env')
 
     ########################################################################################################################
     # VARIABLES
@@ -16,6 +16,8 @@ def run_script_from_google_to_mysql():
     DB_USER = os.getenv("DB_USER")
     DB_PASSWORD = os.getenv("DB_PASSWORD")
     DB_DBNAME = os.getenv("DB_DBNAME")
+
+    print(f'starting run_script_from_google_to_mysql')
 
     ########################################################################################################################
 

@@ -90,9 +90,13 @@ def update_deposit_value(payment_type: str, deposit_min_value: str, deposit_aver
 
 
 def get_google_payment_method(google_pm_sheet_id: str, google_pm_gid: str, google_pm_columns: dict) -> pd.DataFrame:
+
     # загрузим данные по типам счетов из таблицы google
     url = f"https://docs.google.com/spreadsheets/d/{google_pm_sheet_id}/export?format=csv&gid={google_pm_gid}"
+    print(f'  upload data from {url}')
     payment_method = pd.read_csv(url)
+
+    print(f'  update dataframe payment_method')
 
     # оставим только нужные поля и переименуем
     payment_method = payment_method[google_pm_columns.keys()].rename(

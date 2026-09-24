@@ -1,6 +1,7 @@
-import datetime
 import json
 import requests
+
+from datetime import datetime
 from requests.auth import HTTPBasicAuth
 from time import sleep as sys_sleep
 
@@ -84,15 +85,51 @@ def create_invoice_on_1c(scloud_base, scloud_login, scloud_password, df_new_invo
         interval_cnt = row['interval_cnt']
         interval_sale = row['interval_sale']
         source_invoice = row['source_invoice']
-
         legal_entity = row['legal_entity']
         city_invoice = row['city_invoice']
-        source_invoice = row['source_invoice']
+        interval_invoice = row['interval_invoice']
         interval_receipt = row['interval_receipt']
         interval_correction = row['interval_correction']
         interval_deposit_balance = row['interval_deposit_balance']
         deposit_min_value = row['deposit_min_value']
         deposit_average_value = row['deposit_average_value']
+
+        city_str = f", город = {city_invoice}" if len(city_invoice) > 0 else ""
+        comment = (
+            "массаж"
+            if source_invoice == "РМ"
+            else ("Александрит" if source_invoice == "АЛЭ" else "нет")
+        )
+        nds = int(invoice_amount * 5 / 105 * 100) / 100
+
+        msg = (
+            f"*'{legal_entity}'*\n"
+            f"(ИНН = {inn}{city_str}, комментарий = '{comment}')\n\n"
+            f"Счет : {invoice_amount:_.0f} руб. (НДС = {nds:_.2f})\n\n"
+            f"_детализация расчетов:_\n\n"
+        ).replace('_', ' ')
+
+        if payment_type == "депозит":
+            payment_details = (
+                f"минимальный депозит = {deposit_min_value:_.0f}\n"
+                f"средний депозит = {deposit_average_value:_.0f}\n\n"
+                f"стоимость лидов = {interval_sale:_.0f}\n"
+                f"сумма счетов = {max(interval_invoice, interval_receipt):_.0f}\n"
+                f"корректировка = {interval_correction:_.0f}\n"
+                f"итого остаток = {interval_deposit_balance:_.0f}"
+            ).replace('_', ' ')
+        else:
+            payment_details = (
+                f"количество лидов = {interval_cnt:_.0f}\n"
+                f"стоимость лидов = {interval_sale:_.0f}\n"
+                f"цена лида = {interval_sale / interval_cnt if interval_cnt != 0 else 0:_.2f}\n"
+                f"!!! цена лида с учетом тестовых (цена 0 руб.)"
+                f"!!! корректировка = {interval_correction:_.0f} - должна быть 0"
+            ).replace('_', ' ')
+
+        msg += f"*тип оплаты = {payment_type}*\n\n" + payment_details
+
+        send_telegram_message(message=msg)
 
         invoice_output[inn] = create_invoice(
             scloud_base=scloud_base,
@@ -108,49 +145,6 @@ def create_invoice_on_1c(scloud_base, scloud_login, scloud_password, df_new_invo
             interval_sale=interval_sale,
             source_invoice=source_invoice
         )
-
-        city_str = f", город = {city_invoice}" if len(city_invoice) > 0 else ""
-        comment = (
-            "массаж"
-            if source_invoice == "РМ"
-            else ("Александрит" if source_invoice == "АЛЭ" else "нет")
-        )
-        nds = int(invoice_amount * 5 / 105 * 100) / 100
-
-        msg = (
-            f"*'{legal_entity}'*\n"
-            f"(ИНН = {inn}{city_str}, комментарий = '{comment}')\n\n"
-            f"Счет : {invoice_amount:_.0f} руб. (НДС = {nds:_.2f})\n\n"
-            f"_детализация расчетов:_\n\n"
-            f"тип оплаты = {payment_type}\n"
-        )
-
-        if payment_type == "депозит":
-            msg += (
-                f"минимальный депозит = {deposit_min_value:_.0f}\n"
-                f"средний депозит = {deposit_average_value:_.0f}\n\n"
-                f"стоимость лидов = {interval_sale:_.0f}\n"
-                f"сумма счетов = {max(interval_invoice, interval_receipt):_.0f}\n"
-                f"корректировка = {interval_correction:_.0f}\n"
-                f"итого остаток = {interval_deposit_balance:_.0f}"
-            )
-        else:
-            avg_price = (
-                interval_sale / interval_cnt if interval_cnt != 0 else 0
-            )
-
-            msg += (
-                f"\nколичество лидов = {interval_cnt:_.0f}\n"
-                f"стоимость лидов = {interval_sale:_.0f}\n"
-                f"цена лида = {avg_price:_.2f}\n"
-                f"* цена лида с учетом тестовых (цена 0 руб.)"
-                f"корректировка = {interval_correction:_.0f} - должна быть 0"
-            )
-
-        msg = msg.replace("_", " ")
-
-        send_telegram_message(message=msg)
-        print(msg)
 
         sys_sleep(1)
 

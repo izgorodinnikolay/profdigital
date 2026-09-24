@@ -4,7 +4,7 @@ from func_import_data_from_1c import get_1с_data_with_retry, nomenclature_text_
 
 def run_script_from_1C_to_mysql():
 
-    load_dotenv(r'C:\Users\user\Desktop\Maks\projects\invoices_2026_07_26\variables.env')
+    load_dotenv('variables.env')
 
     ########################################################################################################################
     # VARIABLES
@@ -21,6 +21,7 @@ def run_script_from_1C_to_mysql():
     DB_PASSWORD = os.getenv("DB_PASSWORD")
     DB_DBNAME = os.getenv("DB_DBNAME")
 
+    print(f'starting run_script_from_1C_to_mysql')
 
     ########################################################################################################################
     DOCUMENT = 'Document_СчетНаОплатуПокупателю'
@@ -84,6 +85,9 @@ def run_script_from_1C_to_mysql():
         status_db_table='status_1c',
     )
 
+    df_invoices_detailed['nomenclature_text_gr'] = [*map(nomenclature_text_gr, df_invoices_detailed.nomenclature_text)]
+
+    DB_TABLE = 'invoice_1c'
     export_df_to_db_with_retry(
         df_src=df_invoices,
         db_user=DB_USER,
@@ -91,11 +95,11 @@ def run_script_from_1C_to_mysql():
         db_host=DB_HOST,
         db_port=DB_PORT,
         db_dbname=DB_DBNAME,
-        db_table='invoice_1c',
+        db_table=DB_TABLE,
         truncate=True
     )
 
-    df_invoices_detailed['nomenclature_text_gr'] = [*map(nomenclature_text_gr, df_invoices_detailed.nomenclature_text)]
+    DB_TABLE = 'invoice_detailed_1c'
     export_df_to_db_with_retry(
         df_src=df_invoices_detailed,
         db_user=DB_USER,
@@ -103,7 +107,7 @@ def run_script_from_1C_to_mysql():
         db_host=DB_HOST,
         db_port=DB_PORT,
         db_dbname=DB_DBNAME,
-        db_table='invoice_detailed_1c',
+        db_table=DB_TABLE,
         truncate=True
     )
 

@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="++ выкинуть тестовые -&gt; j28046070_sandbox.view_invoice_report&#10;++ города по кому-то там -&gt; j28046070_sandbox.view_leads, j28046070_sandbox.view_invoices, j28046070_sandbox.view_invoice_report&#10;++ не отправлять счета, если не отправилось сообщение&#10;++ ТГ на прокси&#10;++ переименовать варс (синкануть с версией на сервере)">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/func_import_data_from_1c.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_import_data_from_1c.py" afterDir="false" />
-    </list>
+    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="увеличил timeout=180 для выгрузок из 1С" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -151,7 +148,23 @@
       <option name="project" value="LOCAL" />
       <updated>1790224175817</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="добавил значение response по умолчанию в get_1с_data">
+      <option name="closed" value="true" />
+      <created>1790225981577</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1790225981578</updated>
+    </task>
+    <task id="LOCAL-00012" summary="увеличил timeout=180 для выгрузок из 1С">
+      <option name="closed" value="true" />
+      <created>1790226076509</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1790226076509</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -163,6 +176,8 @@
     <MESSAGE value="test" />
     <MESSAGE value="+ переписать/оптимизировать скрипты на стороне mysql&#10;+ поправить корректирующие суммы по депозитам&#10;+ выставлять счета по депозитам в течение недели&#10;+ заполнять комментарий Александрит и массаж в счетах по АЛЭ и РМ&#10;+ поправить НДС&#10;+ добавить штуки и цену по недепозиту&#10;+ дорабатывать процесс выставления счетов: если был удаленный счет, тоже не выставляем&#10;+ поставить ретраи на mysql_update_view&#10;+ уведомления в ТГ&#10;+ повыкидывать лиды и счета из отчета" />
     <MESSAGE value="++ выкинуть тестовые -&gt; j28046070_sandbox.view_invoice_report&#10;++ города по кому-то там -&gt; j28046070_sandbox.view_leads, j28046070_sandbox.view_invoices, j28046070_sandbox.view_invoice_report&#10;++ не отправлять счета, если не отправилось сообщение&#10;++ ТГ на прокси&#10;++ переименовать варс (синкануть с версией на сервере)" />
-    <option name="LAST_COMMIT_MESSAGE" value="++ выкинуть тестовые -&gt; j28046070_sandbox.view_invoice_report&#10;++ города по кому-то там -&gt; j28046070_sandbox.view_leads, j28046070_sandbox.view_invoices, j28046070_sandbox.view_invoice_report&#10;++ не отправлять счета, если не отправилось сообщение&#10;++ ТГ на прокси&#10;++ переименовать варс (синкануть с версией на сервере)" />
+    <MESSAGE value="добавил значение response по умолчанию в get_1с_data" />
+    <MESSAGE value="увеличил timeout=180 для выгрузок из 1С" />
+    <option name="LAST_COMMIT_MESSAGE" value="увеличил timeout=180 для выгрузок из 1С" />
   </component>
 </project>

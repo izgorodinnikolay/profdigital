@@ -165,7 +165,7 @@ def get_1с_data(
     - DataFrame со статусом ошибки (при сбое).
     """
 
-    response = None
+    response = f'No response whyle uploading {document}'
 
     # Безопасные значения по умолчанию
     dict_columns = dict_columns or {}

@@ -49,7 +49,7 @@ def run_get_data_fom_mysql_and_send_email():
             query=f"""select * from j28046070_sandbox.view_invoice_report order by interval_leads_minus_invoices""",
         )
 
-        if dt_time(5, 0) <= datetime.now().time() <= dt_time(7, 0) or \
+        if dt_time(9, 0) <= datetime.now().time() <= dt_time(11, 0) or \
                 dt_time(15, 0) <= datetime.now().time() <= dt_time(17, 0):
 
             for row in df_invoice_report[

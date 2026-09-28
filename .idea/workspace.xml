@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="увеличил timeout=180 для выгрузок из 1С" />
+    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="увеличил timeout=180 для выгрузок из 1С">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_main_.py" beforeDir="false" afterPath="$PROJECT_DIR$/_main_.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/script4_get_data_fom_mysql_and_send_email.py" beforeDir="false" afterPath="$PROJECT_DIR$/script4_get_data_fom_mysql_and_send_email.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -164,7 +168,15 @@
       <option name="project" value="LOCAL" />
       <updated>1790226076509</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="увеличил timeout=180 для выгрузок из 1С">
+      <option name="closed" value="true" />
+      <created>1790226363417</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1790226363417</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">

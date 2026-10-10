@@ -1,4 +1,15 @@
+import os
 import pandas as pd
+from dotenv import load_dotenv
+
+from func_common import log_errors, send_telegram_message, get_document_structure
+from func_export_df_to_db import export_df_to_db_with_retry
+
+
+load_dotenv('variables.env')
+
+BOT_CHAT_ID_3 = os.getenv("BOT_CHAT_ID_3")
+CHAT_3_TOPIC_PROCESS = os.getenv("CHAT_3_TOPIC_PROCESS")
 
 
 def update_df_single_column_type(df_in: pd.DataFrame, column_name: str, column_type: str):
@@ -23,10 +34,6 @@ def is_float_string(val):
         return True
     except ValueError:
         return False
-
-
-def update_flg_stop(deposit_min_value: str, deposit_average_value: str) -> str:
-    return 'на стопе' if deposit_min_value == 'на стопе' or deposit_average_value == 'на стопе' else ''
 
 
 def update_inn(inn: str, comment: str) -> list:
@@ -90,13 +97,9 @@ def update_deposit_value(payment_type: str, deposit_min_value: str, deposit_aver
 
 
 def get_google_payment_method(google_pm_sheet_id: str, google_pm_gid: str, google_pm_columns: dict) -> pd.DataFrame:
-
     # загрузим данные по типам счетов из таблицы google
     url = f"https://docs.google.com/spreadsheets/d/{google_pm_sheet_id}/export?format=csv&gid={google_pm_gid}"
-    print(f'  upload data from {url}')
     payment_method = pd.read_csv(url)
-
-    print(f'  update dataframe payment_method')
 
     # оставим только нужные поля и переименуем
     payment_method = payment_method[google_pm_columns.keys()].rename(
@@ -107,13 +110,13 @@ def get_google_payment_method(google_pm_sheet_id: str, google_pm_gid: str, googl
     payment_method['payment_type'] = payment_method['payment_type'].ffill()
 
     # заменим нулы на '?'
-    payment_method = payment_method.fillna('?')
+    payment_method[['inn', 'payment_type', 'deposit_min_value', 'deposit_average_value']] = \
+        payment_method[['inn', 'payment_type', 'deposit_min_value', 'deposit_average_value']].fillna('?')
 
     # добавим поле comment для заполнения инфо по качеству заполнения данных в google-таблице
     payment_method['comment'] = ''
 
-    payment_method['flg_stop'] = [
-        *map(update_flg_stop, payment_method.deposit_min_value, payment_method.deposit_average_value)]
+    # payment_method['flg_stop'] = [*map(update_flg_stop, payment_method.deposit_min_value, payment_method.deposit_average_value)]
 
     # обновим ИНН, т.к. при конвертации данных из google-таблицы, python добавляет '.0' в конце
     payment_method[['inn', 'comment']] = [*map(update_inn, payment_method.inn, payment_method.comment)]
@@ -135,3 +138,48 @@ def get_google_payment_method(google_pm_sheet_id: str, google_pm_gid: str, googl
               payment_method.comment)]
 
     return payment_method
+
+
+@log_errors
+def get_google_data_and_upload_to_mysql(
+        google_pm_sheet_id: str,
+        google_pm_gid: str,
+        google_config: str,
+        db_user: str,
+        db_password: str,
+        db_host: str,
+        db_port: int,
+        db_dbname: str,
+        truncate: bool = True,
+        max_retries: int = 5,
+        retry_sleep_seconds: int = 90,
+        notification_flg: bool = False
+):
+    if notification_flg:
+        process_msg = f"upload data from https://docs.google.com/spreadsheets/d/{google_pm_sheet_id}/export?format=csv&gid={google_pm_gid}"
+        print(f'    {process_msg}')
+        send_telegram_message(chat_id=BOT_CHAT_ID_3, message=process_msg, topic_id=CHAT_3_TOPIC_PROCESS)
+
+    config_vars = get_document_structure(google_config)
+
+    google_pm_columns = config_vars.get('GOOGLE_PM_COLUMNS')
+    db_table = config_vars.get('DB_TABLE')
+
+    df_from_google = get_google_payment_method(
+        google_pm_sheet_id=google_pm_sheet_id,
+        google_pm_gid=google_pm_gid,
+        google_pm_columns=google_pm_columns
+    )
+
+    export_df_to_db_with_retry(
+        df_src=df_from_google,
+        db_user=db_user,
+        db_password=db_password,
+        db_host=db_host,
+        db_port=db_port,
+        db_dbname=db_dbname,
+        db_table=db_table,
+        truncate=truncate,
+        max_retries=max_retries,
+        retry_sleep_seconds=retry_sleep_seconds
+    )

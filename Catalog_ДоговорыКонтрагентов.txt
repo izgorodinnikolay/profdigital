@@ -1,0 +1,17 @@
+MYSQL_TBL='contract_1c'
+DICT_COLUMNS = {
+    'Ref_Key':['contract_id', 'string'],
+    # 'DataVersion':'',
+    'DeletionMark':['is_deleted', 'boolean'],
+    'Owner_Key':['partner_id', 'string'],
+    'Code':['contract_number', 'string'],
+    'Description':['description','string'],
+    'ВалютаВзаиморасчетов_Key':['currency_id','string'],
+    'Комментарий':['comment', 'string'],
+    'Организация_Key':['organization_id','string'],
+    'ВидДоговора':['contract_type','string'],
+    'Руководитель_Key':['manager_id','string'],
+    'РуководительКонтрагента':['partner_manager','string'],
+    'СпособЗаполненияСтавкиНДС':['vat_type','string'],
+    'СтавкаНДС':['vat','string']
+}

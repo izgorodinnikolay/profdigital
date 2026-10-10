@@ -1,0 +1,9 @@
+MYSQL_TBL='users_1c'
+DICT_COLUMNS = {
+    'Ref_Key':['user_id', 'string'], # user_id
+    'DeletionMark':['is_deleted', 'boolean'],
+    'Description':['description', 'string'],
+    'Недействителен':['is_unavailable', 'boolean'],
+    'Служебный':['is_service', 'boolean'],
+    'Подготовлен':['is_prepared', 'boolean'],
+}

@@ -1,0 +1,11 @@
+MYSQL_TBL='cash_flow_article_1c'
+DICT_COLUMNS = {
+    'Ref_Key':['cash_flow_article_id', 'string'],
+    'DeletionMark':['is_deleted', 'boolean'],
+    'IsFolder':['is_folder', 'boolean'],
+    'Code':['cash_flow_article_number', 'string'],
+    'Description':['description', 'string'],
+    'ВидДвиженияДенежныхСредств':['cash_flow_article_type', 'string'],
+    'Комментарий':['comment', 'string'], 
+    'PredefinedDataName':['predefined_data_name', 'string']
+}

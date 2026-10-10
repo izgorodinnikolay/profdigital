@@ -1,0 +1,12 @@
+df_invoice_report = f"""select * from j28046070_sandbox.view_invoice_report order by interval_invoices_minus_leads"""
+df_new_invoices = f"""
+select inn, project, legal_entity, city_invoice, source_invoice
+    ,payment_type, deposit_min_value, deposit_average_value
+    ,interval_cnt, interval_purchase, interval_sale, interval_invoice, interval_receipt, interval_correction, interval_invoices_minus_leads
+    ,new_invoice_flag, new_invoice_description_short, new_invoice_description_long, new_invoice_amount, new_invoice_errors
+    ,partner_id, contract_id, organization_id, manager_key 
+from j28046070_sandbox.view_invoice_report
+where new_invoice_flag = 'Да'
+"""
+df_errors = f"""select * from j28046070_sandbox.view_invoice_report where new_invoice_errors != '' """
+df_payment_method = f"""select * from j28046070_sandbox.view_payment_method"""

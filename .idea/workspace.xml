@@ -4,22 +4,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="актуализировал время работы">
-      <change afterPath="$PROJECT_DIR$/func_export_df_to_db.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/func_get_1c_data.py" afterDir="false" />
+    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="1. оптимизировать SQL &amp; словари:&#10;- вынести SQL из скрипта &#10;- вынести словари из скрипта &#10;- обернуть все в ф-цию&#10;2. реализовать сообщения о ходе процесса - переупаковать в ф-цию&#10;3. отладить обработку ошибок:&#10;- убрать логирование в ProfDigi (1. и так есть проблемы с коннектами - лучше лишний раз не дергать; 2. никто их не смотрит&#10;- переделать отправку сообщений об ошибках в ТГ&#10;- переделать вывод ошибок &#10;4. добавить в процесс статус &quot;на стопе&quot;">
+      <change afterPath="$PROJECT_DIR$/Catalog_БанковскиеСчета.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Catalog_ДоговорыКонтрагентов.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Catalog_Контрагенты.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Catalog_Организации.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Catalog_Пользователи.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Catalog_СтатьиДвиженияДенежныхСредств.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Catalog_ФизическиеЛица.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Document_ПоступлениеНаРасчетныйСчет.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Document_СписаниеСРасчетногоСчета.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Document_СчетНаОплатуПокупателю.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/df_output.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/j28046070_sandbox.view_invoice_report.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/j28046070_sandbox.view_invoices.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/j28046070_sandbox.view_leads.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/j28046070_sandbox.view_payment_method.sql" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/payment_method.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_main_.py" beforeDir="false" afterPath="$PROJECT_DIR$/_main_.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/func_common.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_common.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/func_import_data_from_1c.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/func_import_data_from_google.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_get_google_data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/func_import_data_from_mysql.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_get_df_from_db.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/func_new_invoices_1c.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_new_invoices_1c.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/func_update_data_on_mysql.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_mysql_update_view.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/script1_from_1C_to_mysql.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/script2_from_google_to_mysql.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/script3_update_mysql_views.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/script4_get_data_fom_mysql_and_send_email.py" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -211,7 +213,15 @@
       <option name="project" value="LOCAL" />
       <updated>1790574899772</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="1. оптимизировать SQL &amp; словари:&#10;- вынести SQL из скрипта &#10;- вынести словари из скрипта &#10;- обернуть все в ф-цию&#10;2. реализовать сообщения о ходе процесса - переупаковать в ф-цию&#10;3. отладить обработку ошибок:&#10;- убрать логирование в ProfDigi (1. и так есть проблемы с коннектами - лучше лишний раз не дергать; 2. никто их не смотрит&#10;- переделать отправку сообщений об ошибках в ТГ&#10;- переделать вывод ошибок &#10;4. добавить в процесс статус &quot;на стопе&quot;">
+      <option name="closed" value="true" />
+      <created>1791652636309</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1791652636309</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -227,6 +237,7 @@
     <MESSAGE value="увеличил timeout=180 для выгрузок из 1С" />
     <MESSAGE value="добавил кричалку &quot;ПРИБЛИЖАЕТСЯ ОПЛАТА&quot;" />
     <MESSAGE value="актуализировал время работы" />
-    <option name="LAST_COMMIT_MESSAGE" value="актуализировал время работы" />
+    <MESSAGE value="1. оптимизировать SQL &amp; словари:&#10;- вынести SQL из скрипта &#10;- вынести словари из скрипта &#10;- обернуть все в ф-цию&#10;2. реализовать сообщения о ходе процесса - переупаковать в ф-цию&#10;3. отладить обработку ошибок:&#10;- убрать логирование в ProfDigi (1. и так есть проблемы с коннектами - лучше лишний раз не дергать; 2. никто их не смотрит&#10;- переделать отправку сообщений об ошибках в ТГ&#10;- переделать вывод ошибок &#10;4. добавить в процесс статус &quot;на стопе&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="1. оптимизировать SQL &amp; словари:&#10;- вынести SQL из скрипта &#10;- вынести словари из скрипта &#10;- обернуть все в ф-цию&#10;2. реализовать сообщения о ходе процесса - переупаковать в ф-цию&#10;3. отладить обработку ошибок:&#10;- убрать логирование в ProfDigi (1. и так есть проблемы с коннектами - лучше лишний раз не дергать; 2. никто их не смотрит&#10;- переделать отправку сообщений об ошибках в ТГ&#10;- переделать вывод ошибок &#10;4. добавить в процесс статус &quot;на стопе&quot;" />
   </component>
 </project>

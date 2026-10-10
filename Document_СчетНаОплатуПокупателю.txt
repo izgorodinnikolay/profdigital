@@ -1,0 +1,44 @@
+MYSQL_TBL='invoice_1c'
+MYSQL_TBL_DETAILED='invoice_detailed_1c'
+DICT_COLUMNS = {
+    'Ref_Key':['invoice_id', 'string'],
+    'Number':['invoice_number', 'string'],
+    'ВидОперации':['invoice_type', 'string'],
+    'Date':['invoice_dt', 'datetime'],
+    'Posted':['is_posted', 'boolean'],
+    'Организация_Key':['organization_id', 'string'],
+    'Контрагент_Key':['partner_id', 'string'],
+    'ДоговорКонтрагента_Key':['contract_id', 'string'],
+    'СтруктурнаяЕдиница_Key':['account_id', 'string'],
+    'СуммаДокумента':['invoice_amount', 'float'],
+    'ВалютаДокумента_Key':['currency_id', 'string'],
+    'DeletionMark':['is_deleted', 'boolean'],
+    'Товары':['service_name', 'list'],
+    'Комментарий':['invoice_comment', 'string'],
+    'ОрганизацияПолучатель_Key':['recipient_key', 'string'],
+    'ДополнительныеУсловия_Key':['additional_terms', 'string'],
+    'Ответственный_Key':['user_key', 'string'],
+    'Руководитель_Key':['manager_key', 'string'],
+    'УдалитьУчитыватьНДС':['vat_flag', 'boolean'],
+    'СпособДоставки_Key':['delivery_method_key', 'string'],
+    'ВариантПечатиQRКода':['print_qr','string']
+}
+EXPLODE_COLUMN = 'service_name'
+DICT_EXPLODE_COLUMNS = {
+        # 'Ref_Key':['child_invoice_id', 'string'],
+        'LineNumber':['row_num', 'int'],
+        'Номенклатура':['nomenclature', 'string'],
+        # 'Номенклатура_Type':'nomenclature_type',
+        'Содержание':['nomenclature_text', 'string'],
+        'Количество':['quantity', 'int'],
+        'Цена':['price', 'float'],
+        'Сумма':['amount', 'float'],
+        'ПроцентСкидки':['discount_percent', 'float'],
+        'СуммаСкидки':['discount_amount', 'float'], 
+        'СтавкаНДС':['vat_rate', 'string'], 
+        'СуммаНДС':['vat_amount', 'float'],
+        # 'КлючКалькуляцииРасходов',
+        # 'ВидЛьготыПоТуристическомуНалогу', 
+        'ИдентификаторСтроки':['row_id', 'string'],
+        'ИдентификаторРодительскойСтроки':['parent_row_id', 'string']
+    }

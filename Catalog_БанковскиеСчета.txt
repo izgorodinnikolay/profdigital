@@ -1,0 +1,16 @@
+MYSQL_TBL='account_1c'
+DICT_COLUMNS = {
+    'Ref_Key':['account_id', 'string'],
+    # 'DataVersion':'',
+    'DeletionMark':['is_deleted', 'boolean'],
+    'Owner':['owner_id', 'string'],
+    'Owner_Type':['owner_id_ref', 'string'],
+    'Code':['account_num', 'string'],
+    'Description':['description','string'],
+    'НомерСчета':['account_number','string'],
+    'Банк_Key':['bank_id','string'],
+    'Валютный':['foreign_flg','boolean'],
+    'ВалютаДенежныхСредств_Key':['currency_id','string'],
+    'ВидСчета':['account_type','string'],
+    'ТекстКорреспондента':['description_2','string'],
+}

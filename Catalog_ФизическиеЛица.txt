@@ -1,0 +1,10 @@
+MYSQL_TBL='individuals_1c'
+DICT_COLUMNS = {
+    'Ref_Key':['individual_id', 'string'],
+    'DeletionMark':['is_deleted', 'boolean'],
+    'IsFolder':['is_folder','boolean'],
+    'Code':['individual_number','string'],
+    'Description':['description','string'],
+    'ИНН':['inn','string'],
+    'ФИО':['full_name','string']
+}

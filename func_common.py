@@ -92,7 +92,7 @@ def send_telegram_message(token: str = BOT_TOKEN,
                           chat_id: str = BOT_CHAT_ID,
                           message: str = 'Процесс обновления счетов упал',
                           topic_id: int = None,  # Добавили ID топика (message_thread_id)
-                          proxy_url: str = None  # Добавили аргумент для прокси
+                          proxy_url: str = PROXY  # Добавили аргумент для прокси
                           ) -> None:
     """Отправляет сообщение в Telegram через прокси с безопасным HTML-форматированием."""
     response = None

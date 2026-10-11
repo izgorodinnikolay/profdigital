@@ -166,6 +166,7 @@ print(f'5. Выставление счетов ({datetime.now(moscow_tz).strftim
 df = dataframes['df_invoice_report'].copy()
 
 ### 5.1. Отправка сообщений об ошибках
+print(f'    5.1. Отправка сообщений об ошибках')
 # send_telegram_message(chat_id=BOT_CHAT_ID_3, message='Отправка сообщений об ошибках', topic_id=CHAT_3_TOPIC_PROCESS)
 
 criteria_errors = (
@@ -182,6 +183,7 @@ for row in df[criteria_errors].to_dict(orient='records'):
 
 
 ### 5.2. Отправка уведомлений
+print(f'    5.2. Отправка уведомлений')
 # send_telegram_message(chat_id=BOT_CHAT_ID_3, message='Отправка уведомлений', topic_id=CHAT_3_TOPIC_PROCESS)
 
 criteria_warnings = (
@@ -200,7 +202,8 @@ for row in df[criteria_warnings].to_dict(orient='records'):
     send_warnings_to_tg(row)
 
 
-### 5.3. Отправка уведомлений
+### 5.3. Выставление счетов
+print(f'    5.3. Выставление счетов')
 # send_telegram_message(chat_id=BOT_CHAT_ID_3, message='Выставление счетов', topic_id=CHAT_3_TOPIC_PROCESS)
 
 criteria_new_invoice = ((df.new_invoice_flag == 'Да') & (df.stop_flg.str.lower().fillna('') != 'на стопе'))

@@ -4,24 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="1. оптимизировать SQL &amp; словари:&#10;- вынести SQL из скрипта &#10;- вынести словари из скрипта &#10;- обернуть все в ф-цию&#10;2. реализовать сообщения о ходе процесса - переупаковать в ф-цию&#10;3. отладить обработку ошибок:&#10;- убрать логирование в ProfDigi (1. и так есть проблемы с коннектами - лучше лишний раз не дергать; 2. никто их не смотрит&#10;- переделать отправку сообщений об ошибках в ТГ&#10;- переделать вывод ошибок &#10;4. добавить в процесс статус &quot;на стопе&quot;">
-      <change afterPath="$PROJECT_DIR$/Catalog_БанковскиеСчета.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Catalog_ДоговорыКонтрагентов.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Catalog_Контрагенты.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Catalog_Организации.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Catalog_Пользователи.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Catalog_СтатьиДвиженияДенежныхСредств.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Catalog_ФизическиеЛица.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Document_ПоступлениеНаРасчетныйСчет.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Document_СписаниеСРасчетногоСчета.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Document_СчетНаОплатуПокупателю.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/df_output.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/j28046070_sandbox.view_invoice_report.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/j28046070_sandbox.view_invoices.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/j28046070_sandbox.view_leads.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/j28046070_sandbox.view_payment_method.sql" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/payment_method.txt" afterDir="false" />
+    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="Добавлены *.txt и *.sql, необходимые для работы процесса">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_main_.py" beforeDir="false" afterPath="$PROJECT_DIR$/_main_.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/func_common.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_common.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -221,7 +207,15 @@
       <option name="project" value="LOCAL" />
       <updated>1791652636309</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Добавлены *.txt и *.sql, необходимые для работы процесса">
+      <option name="closed" value="true" />
+      <created>1791653372148</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1791653372148</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -238,6 +232,7 @@
     <MESSAGE value="добавил кричалку &quot;ПРИБЛИЖАЕТСЯ ОПЛАТА&quot;" />
     <MESSAGE value="актуализировал время работы" />
     <MESSAGE value="1. оптимизировать SQL &amp; словари:&#10;- вынести SQL из скрипта &#10;- вынести словари из скрипта &#10;- обернуть все в ф-цию&#10;2. реализовать сообщения о ходе процесса - переупаковать в ф-цию&#10;3. отладить обработку ошибок:&#10;- убрать логирование в ProfDigi (1. и так есть проблемы с коннектами - лучше лишний раз не дергать; 2. никто их не смотрит&#10;- переделать отправку сообщений об ошибках в ТГ&#10;- переделать вывод ошибок &#10;4. добавить в процесс статус &quot;на стопе&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="1. оптимизировать SQL &amp; словари:&#10;- вынести SQL из скрипта &#10;- вынести словари из скрипта &#10;- обернуть все в ф-цию&#10;2. реализовать сообщения о ходе процесса - переупаковать в ф-цию&#10;3. отладить обработку ошибок:&#10;- убрать логирование в ProfDigi (1. и так есть проблемы с коннектами - лучше лишний раз не дергать; 2. никто их не смотрит&#10;- переделать отправку сообщений об ошибках в ТГ&#10;- переделать вывод ошибок &#10;4. добавить в процесс статус &quot;на стопе&quot;" />
+    <MESSAGE value="Добавлены *.txt и *.sql, необходимые для работы процесса" />
+    <option name="LAST_COMMIT_MESSAGE" value="Добавлены *.txt и *.sql, необходимые для работы процесса" />
   </component>
 </project>

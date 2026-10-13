@@ -4,10 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="Добавлены *.txt и *.sql, необходимые для работы процесса">
+    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="прописал прокси в ТГ и добавил комменты">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/_main_.py" beforeDir="false" afterPath="$PROJECT_DIR$/_main_.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/func_common.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_common.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/func_get_1c_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_get_1c_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/func_new_invoices_1c.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_new_invoices_1c.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j28046070_sandbox.view_invoice_report.sql" beforeDir="false" afterPath="$PROJECT_DIR$/j28046070_sandbox.view_invoice_report.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j28046070_sandbox.view_invoices.sql" beforeDir="false" afterPath="$PROJECT_DIR$/j28046070_sandbox.view_invoices.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j28046070_sandbox.view_leads.sql" beforeDir="false" afterPath="$PROJECT_DIR$/j28046070_sandbox.view_leads.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -215,7 +220,15 @@
       <option name="project" value="LOCAL" />
       <updated>1791653372148</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="прописал прокси в ТГ и добавил комменты">
+      <option name="closed" value="true" />
+      <created>1791697288602</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1791697288602</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -233,6 +246,7 @@
     <MESSAGE value="актуализировал время работы" />
     <MESSAGE value="1. оптимизировать SQL &amp; словари:&#10;- вынести SQL из скрипта &#10;- вынести словари из скрипта &#10;- обернуть все в ф-цию&#10;2. реализовать сообщения о ходе процесса - переупаковать в ф-цию&#10;3. отладить обработку ошибок:&#10;- убрать логирование в ProfDigi (1. и так есть проблемы с коннектами - лучше лишний раз не дергать; 2. никто их не смотрит&#10;- переделать отправку сообщений об ошибках в ТГ&#10;- переделать вывод ошибок &#10;4. добавить в процесс статус &quot;на стопе&quot;" />
     <MESSAGE value="Добавлены *.txt и *.sql, необходимые для работы процесса" />
-    <option name="LAST_COMMIT_MESSAGE" value="Добавлены *.txt и *.sql, необходимые для работы процесса" />
+    <MESSAGE value="прописал прокси в ТГ и добавил комменты" />
+    <option name="LAST_COMMIT_MESSAGE" value="прописал прокси в ТГ и добавил комменты" />
   </component>
 </project>

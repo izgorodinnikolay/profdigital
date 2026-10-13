@@ -18,7 +18,7 @@ load_dotenv('variables.env')
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 BOT_CHAT_ID = os.getenv("BOT_CHAT_ID")
 BOT_CHAT_ID_3 = os.getenv("BOT_CHAT_ID_3")
-CHAT_3_TOPIC_ALARM = os.getenv("CHAT_3_TOPIC_ALARM")
+CHAT_3_TOPIC_PROCESS = os.getenv("CHAT_3_TOPIC_PROCESS")
 PROXY = os.getenv("PROXY")
 
 
@@ -49,7 +49,7 @@ def log_errors(func):
                 f"<b>Ошибка:</b> <pre>{safe_error}</pre>\n"
                 f"Детали сохранены в файл логов."
             )
-            send_telegram_message(chat_id=BOT_CHAT_ID_3, message=tg_msg, topic_id=CHAT_3_TOPIC_ALARM)
+            send_telegram_message(chat_id=BOT_CHAT_ID_3, message=tg_msg, topic_id=CHAT_3_TOPIC_PROCESS)
 
             # Прерываем скрипт
             sys.exit(1)

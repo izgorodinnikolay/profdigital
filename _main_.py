@@ -44,7 +44,7 @@ moscow_tz = ZoneInfo("Europe/Moscow")
 # MAIN SCRIPT
 
 print(f'Процесс выставления счетов запущен ({datetime.now(moscow_tz).strftime("%Y-%m-%d %H:%M:%S")})')
-# send_telegram_message(chat_id=BOT_CHAT_ID_3, message='Процесс выставления счетов запущен', topic_id=CHAT_3_TOPIC_PROCESS)
+send_telegram_message(chat_id=BOT_CHAT_ID_3, message='Процесс выставления счетов запущен', topic_id=CHAT_3_TOPIC_PROCESS)
 
 
 # 1. Выгрузка данных из 1С
@@ -165,41 +165,46 @@ print(f'5. Выставление счетов ({datetime.now(moscow_tz).strftim
 
 df = dataframes['df_invoice_report'].copy()
 
-### 5.1. Отправка сообщений об ошибках
-print(f'    5.1. Отправка сообщений об ошибках')
-# send_telegram_message(chat_id=BOT_CHAT_ID_3, message='Отправка сообщений об ошибках', topic_id=CHAT_3_TOPIC_PROCESS)
 
-criteria_errors = (
-    (~df.inn.isin(['7840087426', '720306065102'])) &
-    (df.stop_flg.str.lower().fillna('') != 'на стопе') &
-    (((df.prev_cnt > 0) & (df.interval_sale > 0) & (df.project == 'нет инфо')) |
-     ((df.prev_cnt > 0) & (df.interval_sale > 0) & (df.partner_id.isna())) |
-     ((df.prev_cnt > 0) & (df.interval_sale > 0) & (df.contract_id.isna()))
-     )
-)
+if datetime.strptime("09:50", "%H:%M").time() <= datetime.now().time() <= datetime.strptime("11:50", "%H:%M").time():
 
-for row in df[criteria_errors].to_dict(orient='records'):
-    send_errors_to_tg(row)
+    ### 5.1. Отправка сообщений об ошибках
+    print(f'    5.1. Отправка сообщений об ошибках')
+    # send_telegram_message(chat_id=BOT_CHAT_ID_3, message='Отправка сообщений об ошибках', topic_id=CHAT_3_TOPIC_PROCESS)
+
+    criteria_errors = (
+        (~df.inn.isin(['7840087426', '720306065102'])) &
+        (df.new_invoice_flag == 'Нет') &
+        (df.stop_flg.str.lower().fillna('') != 'на стопе') &
+        (((df.prev_cnt > 0) & (df.interval_sale > 0) & (df.project == 'нет инфо')) |
+         ((df.prev_cnt > 0) & (df.interval_sale > 0) & (df.partner_id.isna())) |
+         ((df.prev_cnt > 0) & (df.interval_sale > 0) & (df.contract_id.isna()))
+         )
+    )
+
+    for row in df[criteria_errors].to_dict(orient='records'):
+        send_errors_to_tg(row)
 
 
-### 5.2. Отправка уведомлений
-print(f'    5.2. Отправка уведомлений')
-# send_telegram_message(chat_id=BOT_CHAT_ID_3, message='Отправка уведомлений', topic_id=CHAT_3_TOPIC_PROCESS)
+    ### 5.2. Отправка уведомлений
+    print(f'    5.2. Отправка уведомлений')
+    # send_telegram_message(chat_id=BOT_CHAT_ID_3, message='Отправка уведомлений', topic_id=CHAT_3_TOPIC_PROCESS)
 
-criteria_warnings = (
-    (~df.inn.isin(['7840087426', '720306065102'])) &
-    (df.stop_flg.str.lower().fillna('') != 'на стопе') &
-    (df.project != 'нет инфо') &
-    (~df.partner_id.isna()) &
-    (~df.contract_id.isna()) &
-    (df.prev_cnt > 0) &
-    (((df.payment_type == 'депозит') &
-      (df.interval_invoices_minus_leads <= df.deposit_min_value * 2)) |
-     (df.interval_invoices_minus_leads < 0))
-)
+    criteria_warnings = (
+        (~df.inn.isin(['7840087426', '720306065102'])) &
+        (df.new_invoice_flag == 'Нет') &
+        (df.stop_flg.str.lower().fillna('') != 'на стопе') &
+        (df.project != 'нет инфо') &
+        (~df.partner_id.isna()) &
+        (~df.contract_id.isna()) &
+        (df.prev_cnt > 0) &
+        (((df.payment_type == 'депозит') &
+          (df.interval_invoices_minus_leads <= df.deposit_min_value * 2)) |
+         (df.interval_invoices_minus_leads < 0))
+    )
 
-for row in df[criteria_warnings].to_dict(orient='records'):
-    send_warnings_to_tg(row)
+    for row in df[criteria_warnings].to_dict(orient='records'):
+        send_warnings_to_tg(row)
 
 
 ### 5.3. Выставление счетов
@@ -225,7 +230,7 @@ elif len(df[criteria_new_invoice]) < 5:
 else:
     invoices_msg = f'Выставлено {len(df[criteria_new_invoice])} счетов'
 
-print(f'invoices_msg')
+print(f'{invoices_msg}')
 send_telegram_message(chat_id=BOT_CHAT_ID_3, message=invoices_msg, topic_id=CHAT_3_TOPIC_PROCESS)
 
 print(f'Процесс выставления счетов завершен ({datetime.now(moscow_tz).strftime("%Y-%m-%d %H:%M:%S")})')

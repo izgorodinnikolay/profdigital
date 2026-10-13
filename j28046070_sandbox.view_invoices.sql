@@ -25,6 +25,8 @@ select i.invoice_id, i.invoice_number, i.invoice_dt
           when p.partner_inn = '4205421649' and p.partner_name = 'ООО КОМАНДА МЕЧТЫ КЕМЕРОВО Новокузнецк' then 'Новокузнецк'
           when p.partner_inn = '7727471830' and p.partner_name = 'ЕВРОМЕД Екб ООО' then 'Екатеринбург'
           when p.partner_inn = '7727471830' and p.partner_name = 'ЕВРОМЕД ООО' then 'Москва'
+		  when p.partner_inn = '0300032821' and i.invoice_comment = 'Алматы' then 'Алматы'
+		  when p.partner_inn = '0300032821' and i.invoice_comment != 'Алматы' then 'Улан-Удэ'
           else '' end as city_invoice
 	,case when p.partner_inn in ('5047309883','7733331140','7733467800','9701285618','9703181910','9713010350') then 
 		case when i.invoice_comment = 'Александрит' then 'АЛЭ'
@@ -39,6 +41,7 @@ select i.invoice_id, i.invoice_number, i.invoice_dt
     ,o.organization_inn
     ,p.partner_name
     ,case when p.partner_inn = '760212666248' then '761107378757'
+		  when p.partner_inn = '8603207842'   then '7813189404'
           else p.partner_inn
     end as partner_inn
     ,p.partner_type

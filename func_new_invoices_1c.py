@@ -99,8 +99,10 @@ def send_warnings_to_tg(inn_data: dict) -> None:
         else ("Александрит" if inn_data['source_invoice'] == "АЛЭ" else "нет")
     )
 
-    pmnt_msg = f"<b>ПРИБЛИЖАЕТСЯ ОПЛАТА</b>" if inn_data['interval_invoices_minus_leads'] >= inn_data[
-        'deposit_min_value'] else f"<b>ОПЛАТА ПРОСРОЧЕНА</b>"
+    pmnt_msg = f"<b>ПРИБЛИЖАЕТСЯ ОПЛАТА</b>" \
+        if inn_data['interval_invoices_minus_leads'] >= inn_data['deposit_min_value'] else \
+        ('<b>СУММА СЧЁТА МЕНЬШЕ СТОИМОСТИ ЛИДОВ</b>' if inn_data['payment_type'] != 'депозит' \
+             else f"<b>ОПЛАТА ПРОСРОЧЕНА</b>")
 
     deposit_details = (
         f"минимальный депозит = {float_rus_format(inn_data['deposit_min_value'])}\n"

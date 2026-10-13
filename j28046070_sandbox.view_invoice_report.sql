@@ -227,7 +227,7 @@ select lg.inn, pmi.project, pmi.stop_flg, coalesce(p.partner_name, pmi.legal_ent
 	,p.individual_description
 from leads_groupped lg
 left join invoices_groupped ig on lg.inn = ig.inn and lg.city_invoice = ig.city_invoice and lg.source_invoice = ig.source_invoice
-left join partners p on lg.inn = p.inn and lg.city_invoice = p.city_invoice
+left join partners p on lg.inn = p.inn and (lg.city_invoice = p.city_invoice or lg.inn = '0300032821')
 left join j28046070_sandbox.view_payment_method as pmi on lg.inn = pmi.inn
 left join j28046070_sandbox.deposit_corrections as corr on lg.inn = corr.inn and lg.city_invoice = corr.city_invoice and lg.source_invoice = corr.source_invoice
 left join j28046070_sandbox.pm_corrections as pm on lg.inn = pm.inn and lg.city_invoice = pm.city_invoice and lg.source_invoice = pm.source_invoice

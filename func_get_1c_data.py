@@ -63,7 +63,7 @@ def get_1c_data(
         headers=headers,
         params=params,
         auth=HTTPBasicAuth(scloud_user, scloud_password),
-        timeout=30
+        timeout=90
     )
     response.raise_for_status()
     data = response.json()

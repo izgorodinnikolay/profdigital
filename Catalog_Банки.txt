@@ -1,0 +1,16 @@
+MYSQL_TBL='banks_1c'
+DICT_COLUMNS = {
+    'Ref_Key':['bank_id', 'string'],
+    'DeletionMark':['is_deleted', 'boolean'],
+    'Parent_Key':['parent_id', 'string'],
+    'IsFolder':['is_folder', 'boolean'],
+    'Code':['bank_code', 'string'],
+    'Description':['bank_description', 'string'],
+    'КоррСчет':['bank_corr_acc', 'string'],
+    'Город':['bank_city', 'string'],
+    'Адрес':['bank_address', 'string'],
+    'Телефоны':['bank_phone', 'string'],
+    'СВИФТБИК':['bank_swiftbik', 'string'],
+    'Страна_Key':['bank_country', 'string'],
+    'Predefined':['predefined', 'boolean'],
+}

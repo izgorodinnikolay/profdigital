@@ -1,0 +1,13 @@
+MYSQL_TBL='partner_contacts_1c'
+DICT_COLUMNS = {
+    'Ref_Key':['partner_id', 'string'],
+    'LineNumber':['row_num', 'int'],
+    'Тип':['type', 'string'],
+    'Вид_Key':['type_id', 'string'],
+    'Представление':['description', 'string'],
+    'Страна':['country', 'string'],
+    'Регион':['region', 'string'],
+    'Город':['city', 'string'],
+    'АдресЭП':['email', 'string'],
+    'НомерТелефона':['phone', 'string'],
+}

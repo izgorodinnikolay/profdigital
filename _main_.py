@@ -62,7 +62,10 @@ documents_1c_dict = [
     'Catalog_ДоговорыКонтрагентов',
     'Catalog_СтатьиДвиженияДенежныхСредств',
     'Catalog_Пользователи',
-    'Catalog_ФизическиеЛица'
+    'Catalog_ФизическиеЛица',
+    'Catalog_Банки',
+    'Catalog_Контрагенты_КонтактнаяИнформация',
+    'Catalog_Организации_КонтактнаяИнформация',
 ]
 
 for document in documents_1c_dict:

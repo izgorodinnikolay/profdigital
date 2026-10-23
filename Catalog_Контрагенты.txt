@@ -3,7 +3,7 @@ DICT_COLUMNS = {
     'Ref_Key':['partner_id', 'string'],
     # 'DataVersion':'',
     'DeletionMark':['is_deleted', 'boolean'],
-    # 'Parent_Key':'',
+    'Parent_Key':['parent_id', 'string'],
     'IsFolder':['is_folder', 'boolean'],
     'Code':['partner_number', 'string'],
     'Description':['partner_name', 'string'],

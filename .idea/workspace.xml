@@ -4,13 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="- хотфиксы:&#10;1. вернуть инфо о начале процесса&#10;2. вернуть расписание&#10;3. ошибки должны валиться в чат процесса, а не пм&#10;4. ДАША I&#10;- 0300032821 - АЛМАТЫ - договорились реализовать чз коммент&#10;- 7841077780 - поправить оповещения: по тем, кому должен выставиться счет, не пишем о просрочке&#10;- 7733467800 - на стоп&#10;- 340896713235 - договориться, что делаем (там -700) -- переименовать&#10;- 8603207842 -&gt; 7813189404 АППОЛОНИЯ&#10;5. увеличил таймаут для данных 1С">
-      <change afterPath="$PROJECT_DIR$/Catalog_Банки.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Catalog_Контрагенты_КонтактнаяИнформация.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Catalog_Организации_КонтактнаяИнформация.txt" afterDir="false" />
+    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="добавил в выгрузку из 1С несколько объектов">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Catalog_Организации.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Catalog_Организации.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_main_.py" beforeDir="false" afterPath="$PROJECT_DIR$/_main_.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Catalog_Контрагенты.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Catalog_Контрагенты.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j28046070_sandbox.view_leads.sql" beforeDir="false" afterPath="$PROJECT_DIR$/j28046070_sandbox.view_leads.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,6 +28,9 @@
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
@@ -234,7 +234,15 @@
       <option name="project" value="LOCAL" />
       <updated>1791866397849</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="добавил в выгрузку из 1С несколько объектов">
+      <option name="closed" value="true" />
+      <created>1791967892469</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1791967892469</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -254,6 +262,7 @@
     <MESSAGE value="Добавлены *.txt и *.sql, необходимые для работы процесса" />
     <MESSAGE value="прописал прокси в ТГ и добавил комменты" />
     <MESSAGE value="- хотфиксы:&#10;1. вернуть инфо о начале процесса&#10;2. вернуть расписание&#10;3. ошибки должны валиться в чат процесса, а не пм&#10;4. ДАША I&#10;- 0300032821 - АЛМАТЫ - договорились реализовать чз коммент&#10;- 7841077780 - поправить оповещения: по тем, кому должен выставиться счет, не пишем о просрочке&#10;- 7733467800 - на стоп&#10;- 340896713235 - договориться, что делаем (там -700) -- переименовать&#10;- 8603207842 -&gt; 7813189404 АППОЛОНИЯ&#10;5. увеличил таймаут для данных 1С" />
-    <option name="LAST_COMMIT_MESSAGE" value="- хотфиксы:&#10;1. вернуть инфо о начале процесса&#10;2. вернуть расписание&#10;3. ошибки должны валиться в чат процесса, а не пм&#10;4. ДАША I&#10;- 0300032821 - АЛМАТЫ - договорились реализовать чз коммент&#10;- 7841077780 - поправить оповещения: по тем, кому должен выставиться счет, не пишем о просрочке&#10;- 7733467800 - на стоп&#10;- 340896713235 - договориться, что делаем (там -700) -- переименовать&#10;- 8603207842 -&gt; 7813189404 АППОЛОНИЯ&#10;5. увеличил таймаут для данных 1С" />
+    <MESSAGE value="добавил в выгрузку из 1С несколько объектов" />
+    <option name="LAST_COMMIT_MESSAGE" value="добавил в выгрузку из 1С несколько объектов" />
   </component>
 </project>

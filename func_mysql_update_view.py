@@ -39,13 +39,15 @@ def mysql_update_view(
             conn.execute(text("SET SQL_BIG_SELECTS=1"))
             conn.execute(text("SET MAX_JOIN_SIZE=18446744073709551615"))
 
-        if truncate == True:
+        check_query = f"""SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{tbl_db}' AND TABLE_NAME = '{tbl_name}' LIMIT 1"""
+        result = conn.exec_driver_sql(check_query).fetchone()
 
-            check_query = f"""SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{tbl_db}' AND TABLE_NAME = '{tbl_name}' LIMIT 1"""
-            result = conn.exec_driver_sql(check_query).fetchone()
-
-            if result:
+        if result:
+            if truncate:
                 conn.exec_driver_sql(f"TRUNCATE TABLE {tbl_db}.{tbl_name}")
+            query = f"insert into {tbl_db}.{tbl_name}\n" + query
+        else:
+            query = f"create table {tbl_db}.{tbl_name} as\n" + query
 
         conn.exec_driver_sql(query)
 
@@ -75,7 +77,6 @@ def mysql_update_view_with_retry(
 
     query = read_sql_script(f'{tbl_db}.{tbl_name}.sql')
     analyze_tables = get_table_name(query)
-    query = f"insert into {tbl_db}.{tbl_name}\n" + query
 
     for attempt in range(1, max_retries + 1):
 

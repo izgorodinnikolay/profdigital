@@ -6,7 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="добавил в выгрузку из 1С несколько объектов">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Catalog_Контрагенты.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Catalog_Контрагенты.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/_main_.py" beforeDir="false" afterPath="$PROJECT_DIR$/_main_.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/func_mysql_update_view.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_mysql_update_view.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j28046070_sandbox.view_invoice_report.sql" beforeDir="false" afterPath="$PROJECT_DIR$/j28046070_sandbox.view_invoice_report.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/j28046070_sandbox.view_invoices.sql" beforeDir="false" afterPath="$PROJECT_DIR$/j28046070_sandbox.view_invoices.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/j28046070_sandbox.view_leads.sql" beforeDir="false" afterPath="$PROJECT_DIR$/j28046070_sandbox.view_leads.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -242,7 +245,15 @@
       <option name="project" value="LOCAL" />
       <updated>1791967892469</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="добавил в выгрузку из 1С несколько объектов">
+      <option name="closed" value="true" />
+      <created>1792768160801</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1792768160802</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">

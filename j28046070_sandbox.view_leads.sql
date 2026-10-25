@@ -4,6 +4,7 @@ select l.project, l.dateAdd, l.dateTimeAdd
           when l.inn = '760212666248' then '761107378757'
 		  when l.inn = '8603207842'   then '7813189404'
 		  when l.inn = '246207417145' then '246205494401'
+		  when l.inn = '246404867344' then '246110372691'
 	      when length(l.inn) in (9, 11) then concat('0', l.inn) else l.inn end as inn
 	,case when l.inn in ('300032821', '2310229806', '3900034752', '4205421649', '7727471830') then l.city else '' end as city_invoice
 	,case when l.inn in ('5047309883','7733331140','7733467800','9701285618','9703181910','9713010350') then 

@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 from datetime import datetime
 from dotenv import load_dotenv
 from zoneinfo import ZoneInfo
@@ -214,7 +215,17 @@ if datetime.strptime("09:50", "%H:%M").time() <= datetime.now().time() <= dateti
 print(f'    5.3. Выставление счетов')
 # send_telegram_message(chat_id=BOT_CHAT_ID_3, message='Выставление счетов', topic_id=CHAT_3_TOPIC_PROCESS)
 
-criteria_new_invoice = ((df.new_invoice_flag == 'Да') & (df.stop_flg.str.lower().fillna('') != 'на стопе'))
+criteria_new_invoice = (df.new_invoice_flag == 'Да') & (df.stop_flg.str.lower().fillna('') != 'на стопе')
+
+# костыль для Жени
+if df[criteria_new_invoice & (df.inn.isin(['246110372691']))].shape[0] > 0:
+    df.loc[criteria_new_invoice & (df.inn.isin(['246110372691'])), "new_invoice_amount"] = (
+        df.loc[criteria_new_invoice & (df.inn.isin(['246110372691'])), "new_invoice_amount"] / 2
+    )
+    new_rows = df.loc[criteria_new_invoice & (df.inn.isin(['246110372691']))].copy()
+    new_rows["partner_id"] = "cdef713e-b58a-11f1-8c44-00155d46fc0d"
+    new_rows["contract_id"] = "f2ab0826-b58a-11f1-8c44-00155d46fc0d"
+    df = pd.concat([df, new_rows], ignore_index=True)
 
 for row in df[criteria_new_invoice].to_dict(orient='records'):
     create_invoice_on_1c(

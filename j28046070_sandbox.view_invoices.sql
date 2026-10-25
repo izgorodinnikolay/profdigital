@@ -42,6 +42,7 @@ select i.invoice_id, i.invoice_number, i.invoice_dt
     ,p.partner_name
     ,case when p.partner_inn = '760212666248' then '761107378757'
 		  when p.partner_inn = '8603207842'   then '7813189404'
+		  when p.partner_inn = '246404867344' then '246110372691'
           else p.partner_inn
     end as partner_inn
     ,p.partner_type
@@ -53,7 +54,6 @@ select i.invoice_id, i.invoice_number, i.invoice_dt
           when r.receipt_amount = i.invoice_amount then 'Оплачен'
           when r.receipt_amount > i.invoice_amount then 'Оплата больше счета'
           else '!!!ERROR!!!' end as invoice_payment_status
-    ,i.partner_id
 from j28046070_sandbox.invoice_1c i
 left join invoice_nomenclature n on i.invoice_id = n.invoice_id
 left join receipts_gr r on i.invoice_id = r.invoice_id

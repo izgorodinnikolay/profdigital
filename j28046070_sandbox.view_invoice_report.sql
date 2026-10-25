@@ -84,7 +84,9 @@ partners as (
 		where 1=1
 		and c.is_deleted = 0
 		and c.description = 'Ведение платного трафика'
-		and (o.organization_inn = '720307197077' or (p.partner_inn = '7707458687' and o.organization_inn = '503013732480'))
+		and (   o.organization_inn = '720307197077'
+--		    or (p.partner_inn = '7707458687' and o.organization_inn = '503013732480')
+		    )
 		) t
 	where rn = 1
 )

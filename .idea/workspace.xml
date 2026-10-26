@@ -4,13 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="добавил в выгрузку из 1С несколько объектов">
+    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="1. поправил mysql_update_view - теперь, если таблицы нет, будет create, а не insert&#10;2. доработки по Плющу (246110372691 + 246404867344): &#10;- свести лиды и счета на 246110372691&#10;- выставлять счета на 2 ИНН в равных пропорциях">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/_main_.py" beforeDir="false" afterPath="$PROJECT_DIR$/_main_.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/func_mysql_update_view.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_mysql_update_view.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/j28046070_sandbox.view_invoice_report.sql" beforeDir="false" afterPath="$PROJECT_DIR$/j28046070_sandbox.view_invoice_report.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j28046070_sandbox.view_invoices.sql" beforeDir="false" afterPath="$PROJECT_DIR$/j28046070_sandbox.view_invoices.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j28046070_sandbox.view_leads.sql" beforeDir="false" afterPath="$PROJECT_DIR$/j28046070_sandbox.view_leads.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -253,7 +249,15 @@
       <option name="project" value="LOCAL" />
       <updated>1792768160802</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="1. поправил mysql_update_view - теперь, если таблицы нет, будет create, а не insert&#10;2. доработки по Плющу (246110372691 + 246404867344): &#10;- свести лиды и счета на 246110372691&#10;- выставлять счета на 2 ИНН в равных пропорциях">
+      <option name="closed" value="true" />
+      <created>1792916904343</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1792916904343</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -274,6 +278,7 @@
     <MESSAGE value="прописал прокси в ТГ и добавил комменты" />
     <MESSAGE value="- хотфиксы:&#10;1. вернуть инфо о начале процесса&#10;2. вернуть расписание&#10;3. ошибки должны валиться в чат процесса, а не пм&#10;4. ДАША I&#10;- 0300032821 - АЛМАТЫ - договорились реализовать чз коммент&#10;- 7841077780 - поправить оповещения: по тем, кому должен выставиться счет, не пишем о просрочке&#10;- 7733467800 - на стоп&#10;- 340896713235 - договориться, что делаем (там -700) -- переименовать&#10;- 8603207842 -&gt; 7813189404 АППОЛОНИЯ&#10;5. увеличил таймаут для данных 1С" />
     <MESSAGE value="добавил в выгрузку из 1С несколько объектов" />
-    <option name="LAST_COMMIT_MESSAGE" value="добавил в выгрузку из 1С несколько объектов" />
+    <MESSAGE value="1. поправил mysql_update_view - теперь, если таблицы нет, будет create, а не insert&#10;2. доработки по Плющу (246110372691 + 246404867344): &#10;- свести лиды и счета на 246110372691&#10;- выставлять счета на 2 ИНН в равных пропорциях" />
+    <option name="LAST_COMMIT_MESSAGE" value="1. поправил mysql_update_view - теперь, если таблицы нет, будет create, а не insert&#10;2. доработки по Плющу (246110372691 + 246404867344): &#10;- свести лиды и счета на 246110372691&#10;- выставлять счета на 2 ИНН в равных пропорциях" />
   </component>
 </project>

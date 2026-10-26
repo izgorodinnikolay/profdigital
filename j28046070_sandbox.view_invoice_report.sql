@@ -27,18 +27,18 @@ invoices_groupped as (
     	,sum(case when vi.invoice_status = 'Корректный' then vi.receipt_amount else 0 end) as total_receipt
     	,max(case when vi.invoice_status = 'Корректный' then vi.invoice_dt else null end) as total_max_invoice_dt
     	-- interval
-    	,sum(case when vi.invoice_status = 'Корректный' and vi.invoice_dt between pmi.invoice_start and pmi.invoice_end then vi.invoice_amount else 0 end) as interval_invoice
-    	,case when sum(case when vi.invoice_status = 'Корректный' and vi.invoice_dt between pmi.invoice_start and pmi.invoice_end then vi.receipt_amount else 0 end) > 
-    			   sum(case when vi.invoice_status = 'Корректный' and vi.invoice_dt between pmi.invoice_start and pmi.invoice_end then vi.invoice_amount else 0 end)
-    		  then sum(case when vi.invoice_status = 'Корректный' and vi.invoice_dt between pmi.invoice_start and pmi.invoice_end then vi.receipt_amount else 0 end)
-    		  else sum(case when vi.invoice_status = 'Корректный' and vi.invoice_dt between pmi.invoice_start and pmi.invoice_end then vi.invoice_amount else 0 end)
+    	,sum(case when vi.invoice_status = 'Корректный' and cast(vi.invoice_dt as date) between pmi.invoice_start and pmi.invoice_end then vi.invoice_amount else 0 end) as interval_invoice
+    	,case when sum(case when vi.invoice_status = 'Корректный' and cast(vi.invoice_dt as date) between pmi.invoice_start and pmi.invoice_end then vi.receipt_amount else 0 end) >
+    			   sum(case when vi.invoice_status = 'Корректный' and cast(vi.invoice_dt as date) between pmi.invoice_start and pmi.invoice_end then vi.invoice_amount else 0 end)
+    		  then sum(case when vi.invoice_status = 'Корректный' and cast(vi.invoice_dt as date) between pmi.invoice_start and pmi.invoice_end then vi.receipt_amount else 0 end)
+    		  else sum(case when vi.invoice_status = 'Корректный' and cast(vi.invoice_dt as date) between pmi.invoice_start and pmi.invoice_end then vi.invoice_amount else 0 end)
     	end as interval_invoice_corrected
-    	,sum(case when vi.invoice_status = 'Корректный' and vi.invoice_dt between pmi.invoice_start and pmi.invoice_end then vi.receipt_amount else 0 end) as interval_receipt
-    	,max(case when vi.invoice_status = 'Корректный' and vi.invoice_dt between pmi.invoice_start and pmi.invoice_end then vi.invoice_dt else 0 end) as interval_max_invoice_dt
+    	,sum(case when vi.invoice_status = 'Корректный' and cast(vi.invoice_dt as date) between pmi.invoice_start and pmi.invoice_end then vi.receipt_amount else 0 end) as interval_receipt
+    	,max(case when vi.invoice_status = 'Корректный' and cast(vi.invoice_dt as date) between pmi.invoice_start and pmi.invoice_end then vi.invoice_dt else 0 end) as interval_max_invoice_dt
     	-- current period
-    	,sum(case when vi.invoice_dt between pmi.invoice_curr_start and pmi.invoice_curr_end then vi.invoice_amount else null end) as curr_invoice
-    	,sum(case when vi.invoice_dt between pmi.invoice_curr_start and pmi.invoice_curr_end then vi.receipt_amount else null end) as curr_receipt
-    	,max(case when vi.invoice_dt between pmi.invoice_curr_start and pmi.invoice_curr_end then vi.invoice_dt else null end) as curr_max_invoice_dt
+    	,sum(case when cast(vi.invoice_dt as date) between pmi.invoice_curr_start and pmi.invoice_curr_end then vi.invoice_amount else null end) as curr_invoice
+    	,sum(case when cast(vi.invoice_dt as date) between pmi.invoice_curr_start and pmi.invoice_curr_end then vi.receipt_amount else null end) as curr_receipt
+    	,max(case when cast(vi.invoice_dt as date) between pmi.invoice_curr_start and pmi.invoice_curr_end then vi.invoice_dt else null end) as curr_max_invoice_dt
     from j28046070_sandbox.view_invoices as vi
     join j28046070_sandbox.view_payment_method as pmi on vi.partner_inn = pmi.inn
     where 1=1
@@ -110,9 +110,10 @@ select lg.inn, pmi.project, pmi.stop_flg, coalesce(p.partner_name, pmi.legal_ent
 	,'(счета - лиды) за период' as txt_interval_invoice
 	,coalesce(ig.interval_invoice_corrected, 0) + coalesce(corr.correction, 0) - coalesce(lg.interval_sale, 0) as interval_invoices_minus_leads
 	,case when lg.inn in ('7840087426', '720306065102')
-			or lg.prev_cnt = 0 
-			or ig.curr_invoice > 0 
-			or (	pmi.payment_type = 'депозит' 
+			or pmi.stop_flg = 'На стопе'
+			or lg.prev_cnt = 0
+			or ig.curr_invoice > 0
+			or (	pmi.payment_type = 'депозит'
 				and coalesce(ig.interval_invoice_corrected, 0) + coalesce(corr.correction, 0) - coalesce(lg.interval_sale, 0) > pmi.deposit_min_value
 				)
 			or p.partner_id is null
@@ -123,14 +124,16 @@ select lg.inn, pmi.project, pmi.stop_flg, coalesce(p.partner_name, pmi.legal_ent
 	end as new_invoice_flag
 	,case when lg.inn in ('7840087426', '720306065102')
 			then 'Не выставляю счета по этому клиенту'
-		  when lg.prev_cnt = 0 
+		  when pmi.stop_flg = 'На стопе'
+		  	then 'На стопе'
+		  when lg.prev_cnt = 0
 			then 'Нет лидов за предыдущий период'
-		  when ig.curr_invoice > 0 
+		  when ig.curr_invoice > 0
 		  	then 'В текущем периоде счет уже выставлен'
-		  when  pmi.payment_type = 'депозит' 
+		  when  pmi.payment_type = 'депозит'
 		  	and coalesce(ig.interval_invoice_corrected, 0) + coalesce(corr.correction, 0) - coalesce(lg.interval_sale, 0) > pmi.deposit_min_value
 		  	then 'Остаток больше мин депозита'
-		  when p.partner_id is null or p.contract_id is null 
+		  when p.partner_id is null or p.contract_id is null
 		  	then 'Заполнить данные в 1С'
 		  when project = 'нет инфо'
 		  	then 'В google таблице нет инфо по ИНН'
@@ -138,6 +141,8 @@ select lg.inn, pmi.project, pmi.stop_flg, coalesce(p.partner_name, pmi.legal_ent
 	end as new_invoice_description_short
 	,case when lg.inn in ('7840087426', '720306065102')
 			then concat(coalesce(p.partner_name, pmi.legal_entity), ', ИНН ', lg.inn, ' - не выставляю счета по этому клиенту')
+		  when pmi.stop_flg = 'На стопе'
+		  	then 'В google-таблице статус - На стопе'
 		  when lg.prev_cnt = 0 
 			then concat('Нет лидов с ', 
 						date_format(pmi.leads_prev_start, '%%Y-%%m-%%d'), 

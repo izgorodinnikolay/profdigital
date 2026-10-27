@@ -133,22 +133,29 @@ def send_warnings_to_tg(inn_data: dict) -> None:
     sys_sleep(5)
 
 
-def create_invoice(scloud_base,
-                   scloud_login,
-                   scloud_password,
-                   payment_type,
-                   partner_id,
-                   contract_id,
-                   organization_id,
-                   manager_key,
-                   invoice_amount,
-                   interval_cnt,
-                   interval_sale,
-                   source_invoice
+def create_invoice(scloud_base: str,
+                   scloud_login: str,
+                   scloud_password: str,
+                   inn_data: dict
                    ):
     document = 'Document_СчетНаОплатуПокупателю'
     url = f'{scloud_base}/{document}'
     headers = {'Authorization': 'Basic', 'Accept': 'application/json'}
+
+    comment = (
+        'массаж' if inn_data['source_invoice'] == 'РМ' else (
+        'Александрит' if inn_data['source_invoice'] == 'АЛЭ' else (
+        inn_data['city_invoice'] if inn_data['city_invoice'] in ('Алматы', 'Улан-Удэ') else ''))
+    )
+    nomenclature = (
+        'Оплата стоимости лидов (депозит)' if inn_data['payment_type'] == 'депозит' else
+        'Оплата стоимости лидов'
+    )
+    price = (
+        inn_data['invoice_amount'] if inn_data['payment_type'] == 'депозит' else
+        round(inn_data['interval_sale'] / inn_data['interval_cnt'], 2)
+    )
+    cnt = '' if inn_data['payment_type'] == 'депозит' else str(inn_data['interval_cnt'])
 
     document_data = {
         'Date': datetime.strftime(datetime.now(), '%Y-%m-%dT%H:%M:%S'),
@@ -159,13 +166,13 @@ def create_invoice(scloud_base,
         'Ответственный_Key': 'dcbbf600-1c57-11f1-8778-00155d46fc0e',  # dop0265986
 
         # Из MySQL
-        'Контрагент_Key': partner_id,
-        'ДоговорКонтрагента_Key': contract_id,
-        'СуммаДокумента': invoice_amount,
-        'Организация_Key': organization_id,  # ИП Бушуева Е. Б.
-        'ОрганизацияПолучатель_Key': organization_id,  # ИП Бушуева Е. Б.
-        'Руководитель_Key': manager_key,  # Бушуева Елена Борисовна
-        'Комментарий': 'массаж' if source_invoice == 'РМ' else ('Александрит' if source_invoice == 'АЛЭ' else ''),
+        'Контрагент_Key': inn_data['partner_id'],
+        'ДоговорКонтрагента_Key': inn_data['contract_id'],
+        'СуммаДокумента': ['invoice_amount'],
+        'Организация_Key': inn_data['organization_id'],  # ИП Бушуева Е. Б.
+        'ОрганизацияПолучатель_Key': inn_data['organization_id'],  # ИП Бушуева Е. Б.
+        'Руководитель_Key': inn_data['manager_key'],  # Бушуева Елена Борисовна
+        'Комментарий': comment,
 
         # константы
         'ВалютаДокумента_Key': '9838a908-78df-11e8-80df-0050569f2e9f',
@@ -179,14 +186,14 @@ def create_invoice(scloud_base,
             'LineNumber': '1',
             'Номенклатура': '44d84e8c-ab20-11ef-8a67-00155d46f8c3',
             'Номенклатура_Type': 'StandardODATA.Catalog_Номенклатура',
-            'Содержание': 'Оплата стоимости лидов (депозит)' if payment_type == 'депозит' else 'Оплата стоимости лидов',
-            'Количество': 0 if payment_type == 'депозит' else interval_cnt,
-            'Цена': invoice_amount if payment_type == 'депозит' else round(interval_sale / interval_cnt, 2),
-            'Сумма': invoice_amount,
+            'Содержание': nomenclature,
+            'Количество': cnt,
+            'Цена': price,
+            'Сумма': inn_data['invoice_amount'],
             'ПроцентСкидки': 0,
             'СуммаСкидки': 0,
             'СтавкаНДС': 'НДС5',
-            'СуммаНДС': int(invoice_amount * 5 / 105 * 100) / 100}]
+            'СуммаНДС': int(inn_data['invoice_amount'] * 5 / 105 * 100) / 100}]
     }
 
     response = requests.post(url, headers=headers, data=json.dumps(document_data),
@@ -244,15 +251,7 @@ def create_invoice_on_1c(
         scloud_base=scloud_base,
         scloud_login=scloud_login,
         scloud_password=scloud_password,
-        payment_type=inn_data['payment_type'],
-        partner_id=inn_data['partner_id'],
-        contract_id=inn_data['contract_id'],
-        organization_id=inn_data['organization_id'],
-        manager_key=inn_data['manager_key'],
-        invoice_amount=inn_data['new_invoice_amount'],
-        interval_cnt=inn_data['interval_cnt'],
-        interval_sale=inn_data['interval_sale'],
-        source_invoice=inn_data['source_invoice']
+        inn_data=inn_data['payment_type'],
     )
 
     sys_sleep(5)

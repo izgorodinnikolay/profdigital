@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="логирование новых счетов">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/func_new_invoices_1c.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_new_invoices_1c.py" afterDir="false" />
-    </list>
+    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="added response.text to new_invoices.log" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -297,7 +294,15 @@
       <option name="project" value="LOCAL" />
       <updated>1793362318945</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="added response.text to new_invoices.log">
+      <option name="closed" value="true" />
+      <created>1793362972432</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1793362972432</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -322,6 +327,7 @@
     <MESSAGE value="Исправлен баг с учетом счетов, выставленных в воскресение" />
     <MESSAGE value="количество лидов исправлено из текстового" />
     <MESSAGE value="логирование новых счетов" />
-    <option name="LAST_COMMIT_MESSAGE" value="логирование новых счетов" />
+    <MESSAGE value="added response.text to new_invoices.log" />
+    <option name="LAST_COMMIT_MESSAGE" value="added response.text to new_invoices.log" />
   </component>
 </project>

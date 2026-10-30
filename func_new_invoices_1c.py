@@ -168,7 +168,7 @@ def create_invoice(scloud_base: str,
         # Из MySQL
         'Контрагент_Key': inn_data['partner_id'],
         'ДоговорКонтрагента_Key': inn_data['contract_id'],
-        'СуммаДокумента': ['new_invoice_amount'],
+        'СуммаДокумента': inn_data['new_invoice_amount'],
         'Организация_Key': inn_data['organization_id'],  # ИП Бушуева Е. Б.
         'ОрганизацияПолучатель_Key': inn_data['organization_id'],  # ИП Бушуева Е. Б.
         'Руководитель_Key': inn_data['manager_key'],  # Бушуева Елена Борисовна

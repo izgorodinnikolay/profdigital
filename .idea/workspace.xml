@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="количество лидов исправлено из текстового">
+    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="логирование новых счетов">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/func_new_invoices_1c.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_new_invoices_1c.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/j28046070_sandbox.view_invoice_report.sql" beforeDir="false" afterPath="$PROJECT_DIR$/j28046070_sandbox.view_invoice_report.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -290,7 +289,15 @@
       <option name="project" value="LOCAL" />
       <updated>1793357013682</updated>
     </task>
-    <option name="localTasksCounter" value="27" />
+    <task id="LOCAL-00027" summary="логирование новых счетов">
+      <option name="closed" value="true" />
+      <created>1793362318945</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1793362318945</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -314,6 +321,7 @@
     <MESSAGE value="1. поправил mysql_update_view - теперь, если таблицы нет, будет create, а не insert&#10;2. доработки по Плющу (246110372691 + 246404867344): &#10;- свести лиды и счета на 246110372691&#10;- выставлять счета на 2 ИНН в равных пропорциях" />
     <MESSAGE value="Исправлен баг с учетом счетов, выставленных в воскресение" />
     <MESSAGE value="количество лидов исправлено из текстового" />
-    <option name="LAST_COMMIT_MESSAGE" value="количество лидов исправлено из текстового" />
+    <MESSAGE value="логирование новых счетов" />
+    <option name="LAST_COMMIT_MESSAGE" value="логирование новых счетов" />
   </component>
 </project>

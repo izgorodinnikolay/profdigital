@@ -209,6 +209,7 @@ def create_invoice(scloud_base: str,
         'interval_receipt': inn_data['interval_receipt'],
         'correction': 0 if pd.isna(correction) else correction,
         'interval_sale': inn_data['interval_sale'],
+        'response_body': response.text,
     }
     with open('new_invoices.log', 'a', encoding='utf-8') as log_file:
         log_file.write(json.dumps(log_entry, ensure_ascii=False, default=str) + '\n')

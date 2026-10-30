@@ -251,7 +251,7 @@ def create_invoice_on_1c(
         scloud_base=scloud_base,
         scloud_login=scloud_login,
         scloud_password=scloud_password,
-        inn_data=inn_data['payment_type'],
+        inn_data=inn_data
     )
 
     sys_sleep(5)

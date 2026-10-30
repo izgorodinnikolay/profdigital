@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="Исправлен баг с учетом счетов, выставленных в воскресение">
+    <list default="true" id="cb90d478-dad4-48cd-8f7c-54b6b930838b" name="Changes" comment="количество лидов исправлено из текстового">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/func_new_invoices_1c.py" beforeDir="false" afterPath="$PROJECT_DIR$/func_new_invoices_1c.py" afterDir="false" />
     </list>
@@ -265,7 +265,15 @@
       <option name="project" value="LOCAL" />
       <updated>1792991700435</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="количество лидов исправлено из текстового">
+      <option name="closed" value="true" />
+      <created>1793354793131</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1793354793131</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -288,6 +296,7 @@
     <MESSAGE value="добавил в выгрузку из 1С несколько объектов" />
     <MESSAGE value="1. поправил mysql_update_view - теперь, если таблицы нет, будет create, а не insert&#10;2. доработки по Плющу (246110372691 + 246404867344): &#10;- свести лиды и счета на 246110372691&#10;- выставлять счета на 2 ИНН в равных пропорциях" />
     <MESSAGE value="Исправлен баг с учетом счетов, выставленных в воскресение" />
-    <option name="LAST_COMMIT_MESSAGE" value="Исправлен баг с учетом счетов, выставленных в воскресение" />
+    <MESSAGE value="количество лидов исправлено из текстового" />
+    <option name="LAST_COMMIT_MESSAGE" value="количество лидов исправлено из текстового" />
   </component>
 </project>

@@ -152,7 +152,7 @@ def create_invoice(scloud_base: str,
         'Оплата стоимости лидов'
     )
     price = (
-        inn_data['invoice_amount'] if inn_data['payment_type'] == 'депозит' else
+        inn_data['new_invoice_amount'] if inn_data['payment_type'] == 'депозит' else
         round(inn_data['interval_sale'] / inn_data['interval_cnt'], 2)
     )
     cnt = 0 if inn_data['payment_type'] == 'депозит' else inn_data['interval_cnt']
@@ -168,7 +168,7 @@ def create_invoice(scloud_base: str,
         # Из MySQL
         'Контрагент_Key': inn_data['partner_id'],
         'ДоговорКонтрагента_Key': inn_data['contract_id'],
-        'СуммаДокумента': ['invoice_amount'],
+        'СуммаДокумента': ['new_invoice_amount'],
         'Организация_Key': inn_data['organization_id'],  # ИП Бушуева Е. Б.
         'ОрганизацияПолучатель_Key': inn_data['organization_id'],  # ИП Бушуева Е. Б.
         'Руководитель_Key': inn_data['manager_key'],  # Бушуева Елена Борисовна
@@ -189,11 +189,11 @@ def create_invoice(scloud_base: str,
             'Содержание': nomenclature,
             'Количество': cnt,
             'Цена': price,
-            'Сумма': inn_data['invoice_amount'],
+            'Сумма': inn_data['new_invoice_amount'],
             'ПроцентСкидки': 0,
             'СуммаСкидки': 0,
             'СтавкаНДС': 'НДС5',
-            'СуммаНДС': int(inn_data['invoice_amount'] * 5 / 105 * 100) / 100}]
+            'СуммаНДС': int(inn_data['new_invoice_amount'] * 5 / 105 * 100) / 100}]
     }
 
     response = requests.post(url, headers=headers, data=json.dumps(document_data),

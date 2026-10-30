@@ -199,7 +199,19 @@ def create_invoice(scloud_base: str,
     response = requests.post(url, headers=headers, data=json.dumps(document_data),
                              auth=HTTPBasicAuth(scloud_login, scloud_password))
 
-    return response.status_code
+    correction = inn_data.get('interval_correction')
+    log_entry = {
+        'datetime': datetime.now().isoformat(),
+        'inn': inn_data['inn'],
+        'status': response.status_code,
+        'new_invoice_amount': inn_data['new_invoice_amount'],
+        'interval_invoice': inn_data['interval_invoice'],
+        'interval_receipt': inn_data['interval_receipt'],
+        'correction': 0 if pd.isna(correction) else correction,
+        'interval_sale': inn_data['interval_sale'],
+    }
+    with open('new_invoices.log', 'a', encoding='utf-8') as log_file:
+        log_file.write(json.dumps(log_entry, ensure_ascii=False, default=str) + '\n')
 
 
 @log_errors
@@ -247,7 +259,7 @@ def create_invoice_on_1c(
 
     send_telegram_message(chat_id=BOT_CHAT_ID_3, message=msg, topic_id=CHAT_3_TOPIC_NEW_INVOICES)
 
-    invoice_output[inn_data['inn']] = create_invoice(
+    create_invoice(
         scloud_base=scloud_base,
         scloud_login=scloud_login,
         scloud_password=scloud_password,

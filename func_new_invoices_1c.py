@@ -155,7 +155,7 @@ def create_invoice(scloud_base: str,
         inn_data['invoice_amount'] if inn_data['payment_type'] == 'депозит' else
         round(inn_data['interval_sale'] / inn_data['interval_cnt'], 2)
     )
-    cnt = '' if inn_data['payment_type'] == 'депозит' else str(inn_data['interval_cnt'])
+    cnt = 0 if inn_data['payment_type'] == 'депозит' else inn_data['interval_cnt']
 
     document_data = {
         'Date': datetime.strftime(datetime.now(), '%Y-%m-%dT%H:%M:%S'),
